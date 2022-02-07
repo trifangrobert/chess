@@ -7,7 +7,7 @@ const getIndex = (index) => {
 
 const squareColor = (index) => {
     let position = getIndex(index);
-    console.log(position);
+    // console.log(position);
     if ((position[0] + position[1]) % 2 === 0) {
         return 'light';
     }
@@ -31,13 +31,13 @@ const getCol = (index) => {
 const Board = (props) => {
   return (
     <div className={classes.board}>
-      {props.squares.map((square, index) => (
+      {props.board.map((square, index) => (
         <Square
           key={index}
-          square={square}
           squareColor={squareColor(index)}
           row={getRow(index)}
           col={getCol(index)}
+          piece={square}
         //   onClick={() => props.handleClick(index)}
         />
       ))}

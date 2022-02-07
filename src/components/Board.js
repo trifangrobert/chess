@@ -14,6 +14,20 @@ const squareColor = (index) => {
     return 'dark';
 }
 
+const getRow = (index) => {
+  if (index % 8 === 7) { 
+    return 8 - Math.floor(index / 8);
+  }
+  return -1;
+}
+
+const getCol = (index) => {
+  if (index >= 56) {
+    return String.fromCharCode(97 + index - 56);
+  }
+  return -1;
+}
+
 const Board = (props) => {
   return (
     <div className={classes.board}>
@@ -22,6 +36,8 @@ const Board = (props) => {
           key={index}
           square={square}
           squareColor={squareColor(index)}
+          row={getRow(index)}
+          col={getCol(index)}
         //   onClick={() => props.handleClick(index)}
         />
       ))}

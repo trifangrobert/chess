@@ -4,6 +4,27 @@
     padding: 0px;
     width: 75px;
     height: 75px;
+    position: relative;
+}
+
+.row-index {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+}
+
+.col-index {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+}
+
+.dark-index {
+    color: peru;
+}
+
+.light-index {
+    color: bisque
 }
 
 .dark-square {

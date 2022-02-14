@@ -3,8 +3,8 @@
   grid-template: repeat(8, 1fr) / repeat(8, 1fr);
   border: 1px solid #fff;
   border-radius: 0px;
-  width: 600px;
-  height: 600px;
+  width: 640px;
+  height: 640px;
   position: fixed;
   top: 8rem;
   left: 40rem;

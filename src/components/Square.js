@@ -10,7 +10,7 @@ const Square = (props) => {
   const rowIndex = "row-index";
   const colIndex = "col-index";
   return (
-    <div className={`${classes.square} ${classes[squareColor]}`}>
+    <div onClick={() => props.handleClick(props.index)} className={`${classes.square} ${classes[squareColor]}`}>
       {props.piece !== null && <Piece piece={props.piece}/>}
       {props.row !== -1 && <div className={`${classes[indexColor]} ${classes[rowIndex]}`}>{props.row}</div>}
       {props.col !== -1 && <div className={`${classes[indexColor]} ${classes[colIndex]}`}>{props.col}</div>}

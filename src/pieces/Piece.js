@@ -4,6 +4,7 @@ import Bishop from "./Bishop.js";
 import Knight from "./Knight.js";
 import Rook from "./Rook.js";
 import Pawn from "./Pawn.js";
+import MarkedCells from "./MarkedCells.js"
 import classes from './Piece.module.css';
 
 const Piece = (props) => {
@@ -19,6 +20,7 @@ const Piece = (props) => {
   }
   return (
     <div className={classes.piece}>
+      {piece == -1 && <MarkedCells />}
       {piece === 1 && <King player={player} />}
       {piece === 2 && <Queen player={player} />}
       {piece === 3 && <Bishop player={player} />}

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Board from "./components/Board.js";
-import classes from "./App.module.css"
 
 const emptyBoard = () => {
   return new Array(64).fill(null);
@@ -17,9 +16,9 @@ const initBoard = () => {
   1-6 white, 7-12 black
   */
   let board = emptyBoard();
-  for (let i = 0;i < 8;i++) {    
-      board[48 + i] = 6; // white pawn
-      board[8 + i] = 12; //black pawn
+  for (let i = 0; i < 8; i++) {
+    board[48 + i] = 6; // white pawn
+    board[8 + i] = 12; //black pawn
   }
   board[60] = 1; // white king
   board[4] = 7; // black king
@@ -35,15 +34,100 @@ const initBoard = () => {
 
   board[56] = board[63] = 5; // white rook
   board[0] = board[7] = 11; // black rook
+
   return board;
-}
+};
+
+const checkMate = () => {
+  return 1;
+};
+
+const getPieceColor = (piece) => {
+  if (piece > 6) {
+    return 1;
+  }
+  if (piece > 0) {
+    return 0;
+  }
+  return -1;
+};
+
+const getIndex = (x, y) => {
+  return 8 * x + y;
+};
+
+const getPos = (index) => {
+  return [Math.floor(index / 8), index % 8];
+};
+
+const getAccessiblePositions = (index, board) => {
+  // console.log(index);
+  let [x, y] = getPos(index);
+  let piece = board[index];
+  let player = 0;
+  let positions = [];
+  if (piece > 6) {
+    piece -= 6;
+    player = 1;
+  }
+  if (piece === 4) {
+    //knight
+    let diff = [
+      [-2, +1],
+      [-1, +2],
+      [+1, +2],
+      [+2, +1],
+      [+2, -1],
+      [+1, -2],
+      [-1, -2],
+      [-2, -1],
+    ];
+    for (let i = 0; i < diff.length; i++) {
+      let newx = x + diff[i][0];
+      let newy = y + diff[i][1];
+      let newIndex = getIndex(newx, newy);
+      // console.log(x, y);
+      // console.log(newx, newy);
+      // console.log(getPieceColor(board[index]), getPieceColor(board[newIndex]));
+      if (
+        0 <= newx &&
+        newx < 8 &&
+        0 <= newy &&
+        newy < 8 &&
+        getPieceColor(board[index]) !== getPieceColor(board[newIndex])
+      ) {
+        positions.push(newIndex);
+      }
+    }
+  }
+  if (piece === 3) {
+
+  }
+  return positions;
+};
 
 const App = () => {
   const [chessBoard, setChessBoard] = useState(initBoard());
   // console.log(chessBoard);
+
+  const handleClick = (index) => {
+    const positions = getAccessiblePositions(index, chessBoard);
+    // console.log(positions);
+    setChessBoard((prevState) => {
+      let board = emptyBoard();
+      for (let i = 0;i < 64;++i) {
+        board[i] = prevState[i];
+      }
+      for (let i = 0; i < positions.length; ++i) {
+        board[positions[i]] = -1;
+      }
+      return board;
+    });
+    console.log(chessBoard);
+  };
   return (
     <div>
-      <Board board={chessBoard}/>
+      <Board handleClick={handleClick} board={chessBoard} />
     </div>
   );
 };

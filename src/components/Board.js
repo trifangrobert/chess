@@ -29,6 +29,7 @@ const getCol = (index) => {
 }
 
 const Board = (props) => {
+  console.log(props.board);
   return (
     <div className={classes.board}>
       {props.board.map((square, index) => (
@@ -38,7 +39,8 @@ const Board = (props) => {
           row={getRow(index)}
           col={getCol(index)}
           piece={square}
-        //   onClick={() => props.handleClick(index)}
+          index={index}
+          handleClick={props.handleClick}
         />
       ))}
     </div>

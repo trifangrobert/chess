@@ -2,9 +2,10 @@
     background: transparent;
     border: 1px solid transparent;
     padding: 0px;
-    width: 75px;
-    height: 75px;
+    width: 80px;
+    height: 80px;
     position: relative;
+    text-align: center;
 }
 
 .row-index {

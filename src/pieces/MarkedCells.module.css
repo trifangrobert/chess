@@ -8,3 +8,16 @@
   left: 50%;
   margin: -12px 0 0 -12px;
 }
+
+.corner {
+  height: 60px;
+  width: 60px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -40px 0 0 -40px;
+  border-color: red;
+  border-width: 10px;
+  border-style: solid;
+}
+

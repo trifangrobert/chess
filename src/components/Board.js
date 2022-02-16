@@ -30,15 +30,18 @@ const getCol = (index) => {
 
 const Board = (props) => {
   console.log(props.board);
+  let boardPiece = props.board[0];
+  let boardState = props.board[1];
   return (
     <div className={classes.board}>
-      {props.board.map((square, index) => (
+      {boardPiece.map((square, index) => (
         <Square
           key={index}
           squareColor={squareColor(index)}
           row={getRow(index)}
           col={getCol(index)}
-          piece={square}
+          piece={boardPiece[index]}
+          cellState={boardState[index]}
           index={index}
           handleClick={props.handleClick}
         />

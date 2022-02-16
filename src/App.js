@@ -2,7 +2,7 @@ import { useState } from "react";
 import Board from "./components/Board.js";
 
 const emptyBoard = () => {
-  return new Array(64).fill(null);
+  return [new Array(64).fill(null), new Array(64).fill(null)];
 };
 
 const initBoard = () => {
@@ -17,23 +17,25 @@ const initBoard = () => {
   */
   let board = emptyBoard();
   for (let i = 0; i < 8; i++) {
-    board[48 + i] = 6; // white pawn
-    board[8 + i] = 12; //black pawn
+    board[0][48 + i] = 6; // white pawn
+    board[0][8 + i] = 12; //black pawn
   }
-  board[60] = 1; // white king
-  board[4] = 7; // black king
+  board[0][60] = 1; // white king
+  board[0][4] = 7; // black king
 
-  board[59] = 2; // white queen
-  board[3] = 8; // black queen
+  board[0][59] = 2; // white queen
+  board[0][3] = 8; // black queen
 
-  board[58] = board[61] = 3; // white bishop
-  board[2] = board[5] = 9; // black queen
+  board[0][58] = board[0][61] = 3; // white bishop
+  board[0][2] = board[0][5] = 9; // black queen
 
-  board[57] = board[62] = 4; // white knight
-  board[1] = board[6] = 10; // black knight
+  board[0][57] = board[0][62] = 4; // white knight
+  board[0][1] = board[0][6] = 10; // black knight
 
-  board[56] = board[63] = 5; // white rook
-  board[0] = board[7] = 11; // black rook
+  board[0][56] = board[0][63] = 5; // white rook
+  board[0][0] = board[0][7] = 11; // black rook
+
+  board[0][25] = 4;
 
   return board;
 };
@@ -100,26 +102,34 @@ const getAccessiblePositions = (index, board) => {
       }
     }
   }
-  if (piece === 3) {
-
-  }
+  // if (piece === 3) {
+  //   let i = x, j = y;
+  //   let dx = [0, 0, -1, 1];
+  //   let dy = [-1, 1, 0, 0];
+  //   while ()
+  // }
   return positions;
 };
 
 const App = () => {
   const [chessBoard, setChessBoard] = useState(initBoard());
   // console.log(chessBoard);
-
   const handleClick = (index) => {
-    const positions = getAccessiblePositions(index, chessBoard);
+    const positions = getAccessiblePositions(index, chessBoard[0]);
     // console.log(positions);
     setChessBoard((prevState) => {
       let board = emptyBoard();
+      board[1][index] = 3;
       for (let i = 0;i < 64;++i) {
-        board[i] = prevState[i];
+        board[0][i] = prevState[0][i];
       }
-      for (let i = 0; i < positions.length; ++i) {
-        board[positions[i]] = -1;
+      for (let i = 0;i < positions.length;++i) {
+        if (prevState[0][positions[i]] !== null) {
+          board[1][positions[i]] = 2;
+        }
+        else {
+          board[1][positions[i]] = 1;
+        }
       }
       return board;
     });

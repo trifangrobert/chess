@@ -4,23 +4,23 @@ import Bishop from "./Bishop.js";
 import Knight from "./Knight.js";
 import Rook from "./Rook.js";
 import Pawn from "./Pawn.js";
-import MarkedCells from "./MarkedCells.js"
 import classes from './Piece.module.css';
+import MarkedCells from "./MarkedCells.js";
 
 const Piece = (props) => {
+  let piece = props.piece;
   let player = -1;
-  if (props.piece <= 6) {
+  if (piece <= 6) {
     player = 0;
   } else {
     player = 1;
   }
-  let piece = props.piece;
   if (piece > 6) {
     piece -= 6;
   }
   return (
     <div className={classes.piece}>
-      {piece == -1 && <MarkedCells />}
+      {<MarkedCells stateType={props.cellState}/>}
       {piece === 1 && <King player={player} />}
       {piece === 2 && <Queen player={player} />}
       {piece === 3 && <Bishop player={player} />}

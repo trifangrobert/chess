@@ -29,7 +29,7 @@ const getCol = (index) => {
 }
 
 const Board = (props) => {
-  console.log(props.board);
+  // console.log(props.board);
   let boardPiece = props.board[0];
   let boardState = props.board[1];
   return (

@@ -1,6 +1,6 @@
 .square {
     background: transparent;
-    border: 1px solid transparent;
+    /* border: 1px solid transparent; */
     padding: 0px;
     width: 80px;
     height: 80px;

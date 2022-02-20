@@ -1,6 +1,8 @@
 .piece {
-    width: 80px;
-    height: 80px;
-    background-repeat: no-repeat;
-    background-size: 80px 80px;
+  width: 80px;
+  height: 80px;
+  background-repeat: no-repeat;
+  background-size: 80px 80px;
+  z-index: 100;
+  position: relative;
 }

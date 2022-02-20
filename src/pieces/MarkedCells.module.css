@@ -7,17 +7,34 @@
   top: 50%;
   left: 50%;
   margin: -12px 0 0 -12px;
+  z-index: 90;
 }
 
 .corner {
-  height: 60px;
-  width: 60px;
+  height: 70px;
+  width: 70px;
   position: absolute;
   top: 50%;
   left: 50%;
   margin: -40px 0 0 -40px;
-  border-color: red;
-  border-width: 10px;
+  border-radius: 25%;
+  border-color: green;
+  border-width: 5px;
   border-style: solid;
+  z-index: 90;
 }
 
+.selected {
+  height: 70px;
+  width: 70px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -40px 0 0 -40px;
+  border-radius: 25%;
+  border-color: green;
+  background-color: green;
+  border-width: 5px;
+  border-style: solid;
+  z-index: 90;
+}

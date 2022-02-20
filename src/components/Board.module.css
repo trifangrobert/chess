@@ -5,7 +5,8 @@
   border-radius: 0px;
   width: 640px;
   height: 640px;
-  position: fixed;
+  position: absolute;
   top: 8rem;
   left: 40rem;
+  z-index: -100;
 }

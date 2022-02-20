@@ -35,7 +35,8 @@ const initBoard = () => {
   board[0][56] = board[0][63] = 5; // white rook
   board[0][0] = board[0][7] = 11; // black rook
 
-  board[0][25] = 4;
+  board[0][41] = 2;
+  board[0][17] = 12;
 
   return board;
 };
@@ -62,6 +63,10 @@ const getPos = (index) => {
   return [Math.floor(index / 8), index % 8];
 };
 
+const Inside = (x, y) => {
+  return 0 <= x && x < 8 && 0 <= y && y < 8;
+}
+
 const getAccessiblePositions = (index, board) => {
   // console.log(index);
   let [x, y] = getPos(index);
@@ -72,8 +77,58 @@ const getAccessiblePositions = (index, board) => {
     piece -= 6;
     player = 1;
   }
-  if (piece === 4) {
-    //knight
+  if (piece === 1) { // king
+    let i, j;
+    let dx = [0, 0, -1, 1, -1, -1, 1, 1];
+    let dy = [-1, 1, 0, 0, -1, 1, -1, 1];
+    for (let d = 0;d < 8;++d) {
+      i = x + dx[d];
+      j = y + dy[d];
+      let newIndex = getIndex(i, j);
+      if (Inside(i, j) && (getPieceColor(board[index]) !== getPieceColor(board[newIndex]) || board[newIndex] === null)) {
+          positions.push(newIndex);
+      }
+    }
+  }
+  else if (piece === 2) { // queen
+    let i, j;
+    let dx = [0, 0, -1, 1, -1, -1, 1, 1];
+    let dy = [-1, 1, 0, 0, -1, 1, -1, 1];
+    for (let d = 0;d < 8;++d) {
+      i = x + dx[d];
+      j = y + dy[d];
+      let newIndex = getIndex(i, j);
+      while (Inside(i, j) && board[newIndex] === null) {
+        positions.push(newIndex);
+        i += dx[d];
+        j += dy[d];
+        newIndex = getIndex(i, j);
+      }
+      if (Inside(i, j) && board[newIndex] !== null && getPieceColor(board[index]) !== getPieceColor(board[newIndex])) {
+        positions.push(newIndex);
+      }
+    }
+  }
+  else if (piece === 3) { // bishop
+    let i, j;
+    let dx = [-1, -1, 1, 1];
+    let dy = [-1, 1, -1, 1];
+    for (let d = 0;d < 4;++d) {
+      i = x + dx[d];
+      j = y + dy[d];
+      let newIndex = getIndex(i, j);
+      while (Inside(i, j) && board[newIndex] === null) {
+        positions.push(newIndex);
+        i += dx[d];
+        j += dy[d];
+        newIndex = getIndex(i, j);
+      }
+      if (Inside(i, j) && board[newIndex] !== null && getPieceColor(board[index]) !== getPieceColor(board[newIndex])) {
+        positions.push(newIndex);
+      }
+    }
+  }
+  else if (piece === 4) { // knight
     let diff = [
       [-2, +1],
       [-1, +2],
@@ -88,9 +143,6 @@ const getAccessiblePositions = (index, board) => {
       let newx = x + diff[i][0];
       let newy = y + diff[i][1];
       let newIndex = getIndex(newx, newy);
-      // console.log(x, y);
-      // console.log(newx, newy);
-      // console.log(getPieceColor(board[index]), getPieceColor(board[newIndex]));
       if (
         0 <= newx &&
         newx < 8 &&
@@ -102,12 +154,75 @@ const getAccessiblePositions = (index, board) => {
       }
     }
   }
-  // if (piece === 3) {
-  //   let i = x, j = y;
-  //   let dx = [0, 0, -1, 1];
-  //   let dy = [-1, 1, 0, 0];
-  //   while ()
-  // }
+  else if (piece === 5) { // rook
+    let i, j;
+    let dx = [0, 0, -1, 1];
+    let dy = [-1, 1, 0, 0];
+    for (let d = 0;d < 4;++d) {
+      i = x + dx[d];
+      j = y + dy[d];
+      let newIndex = getIndex(i, j);
+      while (Inside(i, j) && board[newIndex] === null) {
+        positions.push(newIndex);
+        i += dx[d];
+        j += dy[d];
+        newIndex = getIndex(i, j);
+      }
+      if (Inside(i, j) && board[newIndex] !== null && getPieceColor(board[index]) !== getPieceColor(board[newIndex])) {
+        positions.push(newIndex);
+      }
+    }
+  }
+  else if (piece === 6) { // pawn
+    let dx;
+    if (player === 0) {
+      dx = -1;
+    }
+    else {
+      dx = 1;
+    }
+
+    let i, j, newIndex;
+    i = x + dx;
+    j = y - 1;
+    newIndex = getIndex(i, j);
+    if (Inside(i, j) && board[newIndex] !== null && getPieceColor(board[index]) !== getPieceColor(board[newIndex])) {
+      positions.push(newIndex);
+    }
+
+    i = x + dx;
+    j = y + 1;
+    newIndex = getIndex(i, j);
+    if (Inside(i, j) && board[newIndex] !== null && getPieceColor(board[index]) !== getPieceColor(board[newIndex])) {
+      positions.push(newIndex);
+    }
+
+    i = x + dx;
+    j = y;
+    newIndex = getIndex(i, j);
+    if (Inside(i, j) && board[newIndex] === null) {
+      positions.push(newIndex);
+    }
+
+    i = x + dx;
+    let ii = x + 2 * dx;
+    j = y;
+    newIndex = getIndex(ii, j);
+    console.log(x);
+    if (player === 0 && x === 6) {
+      console.log(i, j);
+      console.log(ii, j);
+      if (board[getIndex(i, j)] === null && board[newIndex] === null) {
+        positions.push(newIndex);
+      }
+    }
+    if (player === 1 && x === 1) {
+      if (board[getIndex(i, j)] === null && board[newIndex] === null) {
+        positions.push(newIndex);
+      }
+    }
+  }
+  console.log(positions);
   return positions;
 };
 
@@ -116,10 +231,12 @@ const App = () => {
   // console.log(chessBoard);
   const handleClick = (index) => {
     const positions = getAccessiblePositions(index, chessBoard[0]);
-    // console.log(positions);
+    console.log(positions);
     setChessBoard((prevState) => {
       let board = emptyBoard();
-      board[1][index] = 3;
+      if (prevState[0][index] !== null) {
+        board[1][index] = 3;
+      }
       for (let i = 0;i < 64;++i) {
         board[0][i] = prevState[0][i];
       }

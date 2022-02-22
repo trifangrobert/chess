@@ -11,6 +11,9 @@ const MarkedCells = (props) => {
   else if (props.stateType === 3) {
     name = 'selected';
   }
+  else if (props.stateType === 4) {
+    name = 'checkmate';
+  }
   return <div className={classes[name]}></div>;
 };
 

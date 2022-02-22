@@ -1,11 +1,13 @@
 import { useState } from "react";
 import Board from "./components/Board.js";
+import PieceMoves from "./pieces/PieceMoves.js";
 
 const emptyBoard = () => {
   return [new Array(64).fill(null), new Array(64).fill(null)];
 };
 
 let whoMoves = 0;
+let lastMove = [null, null];
 
 const initBoard = () => {
   /* 
@@ -37,14 +39,49 @@ const initBoard = () => {
   board[0][56] = board[0][63] = 5; // white rook
   board[0][0] = board[0][7] = 11; // black rook
 
-  board[0][41] = 2;
-  board[0][17] = 12;
+  // board[0][41] = 2;
+  // board[0][17] = 12;
 
   return board;
 };
 
-const checkMate = () => {
-  return 1;
+const checkMate = (board) => {
+  // console.log(board);
+  let whitePieces = [],
+    blackPieces = [];
+  for (let i = 0; i < 64; ++i) {
+    if (getPieceColor(board[i]) === 0) {
+      whitePieces.push(i);
+    }
+    if (getPieceColor(board[i]) === 1) {
+      blackPieces.push(i);
+    }
+  }
+  // console.log(whitePieces, blackPieces);
+  let whiteMoves = [],
+    blackMoves = [];
+  for (let i = 0; i < whitePieces.length; ++i) {
+    let l = PieceMoves(whitePieces[i], board);
+    whiteMoves.push(...l);
+  }
+  for (let i = 0; i < blackPieces.length; ++i) {
+    let l = PieceMoves(blackPieces[i], board);
+    blackMoves.push(...l);
+  }
+  let checkMateWhite = 0, checkMateBlack = 0;
+  // console.log(whiteMoves, blackMoves);
+  for (let i = 0; i < whiteMoves.length; ++i) {
+    if (board[whiteMoves[i]] === 7) {
+      checkMateBlack = 1;
+    }
+  }
+  for (let i = 0; i < blackMoves.length; ++i) {
+    if (board[blackMoves[i]] === 1) {
+      checkMateWhite = 1;
+    }
+  }
+  // console.log(checkMateWhite, checkMateBlack);
+  return [checkMateWhite, checkMateBlack];
 };
 
 const getPieceColor = (piece) => {
@@ -55,6 +92,13 @@ const getPieceColor = (piece) => {
     return 0;
   }
   return -1;
+};
+
+const getPiece = (piece) => {
+  if (piece > 6) {
+    return piece - 6;
+  }
+  return piece;
 };
 
 const getIndex = (x, y) => {
@@ -69,187 +113,28 @@ const Inside = (x, y) => {
   return 0 <= x && x < 8 && 0 <= y && y < 8;
 };
 
-const getAccessiblePositions = (index, board) => {
-  // console.log(index);
-  let [x, y] = getPos(index);
-  let piece = board[index];
-  let player = 0;
-  let positions = [];
-  if (piece > 6) {
-    piece -= 6;
-    player = 1;
+const getAccessiblePositions = (index, board, lastMove) => {
+  // console.log(lastMove);
+  return PieceMoves(index, board, lastMove);
+};
+
+const legalMove = (prevIndex, currIndex, board) => {
+  // console.log("checking whether it's a legal move or not");
+  let currBoard = emptyBoard();
+  for (let i = 0;i < 64;++i) {
+    currBoard[i] = board[i];
   }
-  if (piece === 1) {
-    // king
-    let i, j;
-    let dx = [0, 0, -1, 1, -1, -1, 1, 1];
-    let dy = [-1, 1, 0, 0, -1, 1, -1, 1];
-    for (let d = 0; d < 8; ++d) {
-      i = x + dx[d];
-      j = y + dy[d];
-      let newIndex = getIndex(i, j);
-      if (
-        Inside(i, j) &&
-        (getPieceColor(board[index]) !== getPieceColor(board[newIndex]) ||
-          board[newIndex] === null)
-      ) {
-        positions.push(newIndex);
-      }
-    }
-  } else if (piece === 2) {
-    // queen
-    let i, j;
-    let dx = [0, 0, -1, 1, -1, -1, 1, 1];
-    let dy = [-1, 1, 0, 0, -1, 1, -1, 1];
-    for (let d = 0; d < 8; ++d) {
-      i = x + dx[d];
-      j = y + dy[d];
-      let newIndex = getIndex(i, j);
-      while (Inside(i, j) && board[newIndex] === null) {
-        positions.push(newIndex);
-        i += dx[d];
-        j += dy[d];
-        newIndex = getIndex(i, j);
-      }
-      if (
-        Inside(i, j) &&
-        board[newIndex] !== null &&
-        getPieceColor(board[index]) !== getPieceColor(board[newIndex])
-      ) {
-        positions.push(newIndex);
-      }
-    }
-  } else if (piece === 3) {
-    // bishop
-    let i, j;
-    let dx = [-1, -1, 1, 1];
-    let dy = [-1, 1, -1, 1];
-    for (let d = 0; d < 4; ++d) {
-      i = x + dx[d];
-      j = y + dy[d];
-      let newIndex = getIndex(i, j);
-      while (Inside(i, j) && board[newIndex] === null) {
-        positions.push(newIndex);
-        i += dx[d];
-        j += dy[d];
-        newIndex = getIndex(i, j);
-      }
-      if (
-        Inside(i, j) &&
-        board[newIndex] !== null &&
-        getPieceColor(board[index]) !== getPieceColor(board[newIndex])
-      ) {
-        positions.push(newIndex);
-      }
-    }
-  } else if (piece === 4) {
-    // knight
-    let diff = [
-      [-2, +1],
-      [-1, +2],
-      [+1, +2],
-      [+2, +1],
-      [+2, -1],
-      [+1, -2],
-      [-1, -2],
-      [-2, -1],
-    ];
-    for (let i = 0; i < diff.length; i++) {
-      let newx = x + diff[i][0];
-      let newy = y + diff[i][1];
-      let newIndex = getIndex(newx, newy);
-      if (
-        0 <= newx &&
-        newx < 8 &&
-        0 <= newy &&
-        newy < 8 &&
-        getPieceColor(board[index]) !== getPieceColor(board[newIndex])
-      ) {
-        positions.push(newIndex);
-      }
-    }
-  } else if (piece === 5) {
-    // rook
-    let i, j;
-    let dx = [0, 0, -1, 1];
-    let dy = [-1, 1, 0, 0];
-    for (let d = 0; d < 4; ++d) {
-      i = x + dx[d];
-      j = y + dy[d];
-      let newIndex = getIndex(i, j);
-      while (Inside(i, j) && board[newIndex] === null) {
-        positions.push(newIndex);
-        i += dx[d];
-        j += dy[d];
-        newIndex = getIndex(i, j);
-      }
-      if (
-        Inside(i, j) &&
-        board[newIndex] !== null &&
-        getPieceColor(board[index]) !== getPieceColor(board[newIndex])
-      ) {
-        positions.push(newIndex);
-      }
-    }
-  } else if (piece === 6) {
-    // pawn
-    let dx;
-    if (player === 0) {
-      dx = -1;
-    } else {
-      dx = 1;
-    }
+  currBoard[currIndex] = currBoard[prevIndex];
+  currBoard[prevIndex] = null;
 
-    let i, j, newIndex;
-    i = x + dx;
-    j = y - 1;
-    newIndex = getIndex(i, j);
-    if (
-      Inside(i, j) &&
-      board[newIndex] !== null &&
-      getPieceColor(board[index]) !== getPieceColor(board[newIndex])
-    ) {
-      positions.push(newIndex);
-    }
-
-    i = x + dx;
-    j = y + 1;
-    newIndex = getIndex(i, j);
-    if (
-      Inside(i, j) &&
-      board[newIndex] !== null &&
-      getPieceColor(board[index]) !== getPieceColor(board[newIndex])
-    ) {
-      positions.push(newIndex);
-    }
-
-    i = x + dx;
-    j = y;
-    newIndex = getIndex(i, j);
-    if (Inside(i, j) && board[newIndex] === null) {
-      positions.push(newIndex);
-    }
-
-    i = x + dx;
-    let ii = x + 2 * dx;
-    j = y;
-    newIndex = getIndex(ii, j);
-    // console.log(x);
-    if (player === 0 && x === 6) {
-      // console.log(i, j);
-      // console.log(ii, j);
-      if (board[getIndex(i, j)] === null && board[newIndex] === null) {
-        positions.push(newIndex);
-      }
-    }
-    if (player === 1 && x === 1) {
-      if (board[getIndex(i, j)] === null && board[newIndex] === null) {
-        positions.push(newIndex);
-      }
-    }
+  let [currCheckMateWhite, currCheckMateBlack] = checkMate(currBoard);
+  // console.log(currCheckMateWhite, currCheckMateBlack);
+  if (whoMoves === 0) {
+    return !currCheckMateWhite;
   }
-  // console.log(positions);
-  return positions;
+  else {
+    return !currCheckMateBlack;
+  }
 };
 
 const App = () => {
@@ -258,78 +143,89 @@ const App = () => {
   const [positions, setPositions] = useState([]);
   // console.log(chessBoard);
   const handleClick = (index) => {
+    // console.log("fuck last move");
+    //     console.log(lastMove)
     let move = [null, null];
     let currPositions = [];
-    console.log(selectedPiece);
+    // console.log(selectedPiece);
     if (selectedPiece !== null && positions.includes(index)) {
-      move = [selectedPiece, index];
-      setPositions([]);
-      currPositions = [];
-      setSelectedPiece(index);
-      whoMoves ^= 1;
-    }
-    else {
+      if (legalMove(selectedPiece, index, chessBoard[0])) {
+        // console.log(chessBoard[0]);
+        move = [selectedPiece, index];
+        lastMove = [selectedPiece, index];
+        // console.log("wtf last move");
+        // console.log(lastMove)
+        setPositions([]);
+        currPositions = [];
+        setSelectedPiece(index);
+        whoMoves ^= 1;
+      } else {
+        setPositions([]);
+        setSelectedPiece(null);
+        currPositions = [];
+        move = [null, null];
+      }
+    } else {
       if (chessBoard[0][index] === null) {
         setPositions([]);
         setSelectedPiece(null);
-        currPositions = []
-        move = [null, null]
-      }
-      else {
+        currPositions = [];
+        move = [null, null];
+      } else {
         if (getPieceColor(chessBoard[0][index]) === whoMoves) {
-          currPositions = getAccessiblePositions(index, chessBoard[0]);
+          // console.log(lastMove);
+          currPositions = getAccessiblePositions(index, chessBoard[0], lastMove);
           setPositions(currPositions);
           setSelectedPiece(index);
-          console.log(positions);
-          console.log(selectedPiece);
+          // console.log(positions);
+          // console.log(selectedPiece);
         } else {
           setPositions([]);
           setSelectedPiece(null);
+          currPositions = [];
+          move = [null, null];
         }
       }
     }
 
-    // if (chessBoard[0][index] === null) {
-    //   if (selectedPiece !== null && positions.includes(index)) {
-    //     move = [selectedPiece, index];
-    //     whoMoves ^= 1;
-    //   } else {
-    //     setPositions([]);
-    //     setSelectedPiece(null);
-    //   }
-    // } else {
-    //   if (getPieceColor(chessBoard[0][index]) === whoMoves) {
-    //     currPositions = getAccessiblePositions(index, chessBoard[0]);
-    //     setPositions(currPositions);
-    //     setSelectedPiece(index);
-    //     console.log(positions);
-    //     console.log(selectedPiece);
-    //   } else {
-    //     setPositions([]);
-    //     setSelectedPiece(null);
-    //   }
-    // }
-    // console.log(positions);
     setChessBoard((prevState) => {
       let board = emptyBoard();
-      console.log(whoMoves);
-      if (prevState[0][index] !== null && getPieceColor(prevState[0][index]) === whoMoves) {
+      // console.log(whoMoves);
+      if (
+        prevState[0][index] !== null &&
+        getPieceColor(prevState[0][index]) === whoMoves
+      ) {
         board[1][index] = 3;
       }
       for (let i = 0; i < 64; ++i) {
         board[0][i] = prevState[0][i];
       }
-      console.log(move);
+      // console.log(move);
       if (move !== [null, null]) {
         board[0][move[1]] = board[0][move[0]];
         board[0][move[0]] = null;
-        board[1][move[1]] = 0;
+        board[1][move[1]] = null;
       }
       for (let i = 0; i < currPositions.length; ++i) {
         if (prevState[0][currPositions[i]] !== null) {
           board[1][currPositions[i]] = 2;
         } else {
           board[1][currPositions[i]] = 1;
+        }
+      }
+      let [checkMateWhite, checkMateBlack] = checkMate(board[0]);
+      if (checkMateBlack === 1) {
+        for (let i = 0; i < 64; ++i) {
+          if (board[0][i] === 7) {
+            board[1][i] = 4;
+          }
+        }
+      }
+      if (checkMateWhite === 1) {
+        for (let i = 0; i < 64; ++i) {
+          if (board[0][i] === 1) {
+            board[1][i] = 4;
+          }
         }
       }
       return board;

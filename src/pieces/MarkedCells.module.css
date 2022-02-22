@@ -32,9 +32,24 @@
   left: 50%;
   margin: -40px 0 0 -40px;
   border-radius: 25%;
+  border-width: 5px;
   border-color: green;
   background-color: green;
+  border-style: solid;
+  z-index: 90;
+}
+
+.checkmate {
+  height: 70px;
+  width: 70px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -40px 0 0 -40px;
+  border-radius: 25%;
+  background-color: red;
   border-width: 5px;
+  border-color: red;
   border-style: solid;
   z-index: 90;
 }

@@ -207,36 +207,34 @@ const PieceMoves = (index, board, lastMove) => {
         positions.push(newIndex);
       }
     }
-    // console.log("this was the last move");
-    // console.log(lastMove);
-    // if (player === 1 && x === 4) {
-    //   let oldPos = getPos(lastMove[0]);
-    //   let newPos = getPos(lastMove[1]);
-    //   if (
-    //     board[lastMove[1]] === 6 &&
-    //     Math.abs(newPos[0] - oldPos[0]) === 2 &&
-    //     Math.abs(y - newPos[1]) === 1
-    //   ) {
-    //     newIndex = getIndex(x, newPos[1]);
-    //     positions.push(newIndex);
-    //     newIndex = getIndex(x + dx, newPos[1]);
-    //     positions.push(newIndex);
-    //   }
-    // }
-    // if (player === 0 && x === 3) {
-    //   let oldPos = getPos(lastMove[0]);
-    //   let newPos = getPos(lastMove[1]);
-    //   if (
-    //     board[lastMove[1]] === 12 &&
-    //     Math.abs(newPos[0] - oldPos[0]) === 2 &&
-    //     Math.abs(y - newPos[1]) === 1
-    //   ) {
-    //     newIndex = getIndex(x, newPos[1]);
-    //     positions.push(newIndex);
-    //     newIndex = getIndex(x + dx, newPos[1]);
-    //     positions.push(newIndex);
-    //   }
-    // }
+    if (lastMove !== undefined) {
+      // console.log("this was the last move");
+      // console.log(lastMove);
+      if (player === 1 && x === 4) {
+        let oldPos = getPos(lastMove[0]);
+        let newPos = getPos(lastMove[1]);
+        if (
+          board[lastMove[1]] === 6 &&
+          Math.abs(newPos[0] - oldPos[0]) === 2 &&
+          Math.abs(y - newPos[1]) === 1
+        ) {
+          newIndex = getIndex(x + dx, newPos[1]);
+          positions.push(newIndex);
+        }
+      }
+      if (player === 0 && x === 3) {
+        let oldPos = getPos(lastMove[0]);
+        let newPos = getPos(lastMove[1]);
+        if (
+          board[lastMove[1]] === 12 &&
+          Math.abs(newPos[0] - oldPos[0]) === 2 &&
+          Math.abs(y - newPos[1]) === 1
+        ) {
+          newIndex = getIndex(x + dx, newPos[1]);
+          positions.push(newIndex);
+        }
+      }
+    }
   }
   // console.log(positions);
   return positions;

@@ -29,7 +29,7 @@ const Inside = (x, y) => {
   return 0 <= x && x < 8 && 0 <= y && y < 8;
 };
 
-const checkMate = (index, board, player) => {
+const check = (index, board, player) => {
   allowCheckForCastling = false;
   let oppPieces = [];
   let oppMoves = [];
@@ -68,9 +68,9 @@ const checkKingCastling = (gameMoves, board, index) => {
       }
     }
     if (
-      checkMate(index, board, player) ||
-      checkMate(index + 1, board, player) ||
-      checkMate(index + 2, board, player) 
+      check(index, board, player) ||
+      check(index + 1, board, player) ||
+      check(index + 2, board, player) 
     ) {
       return false;
     }
@@ -88,9 +88,9 @@ const checkKingCastling = (gameMoves, board, index) => {
       }
     }
     if (
-      checkMate(index, board, player) ||
-      checkMate(index + 1, board, player) ||
-      checkMate(index + 2, board, player)
+      check(index, board, player) ||
+      check(index + 1, board, player) ||
+      check(index + 2, board, player)
     ) {
       return false;
     }
@@ -118,9 +118,9 @@ const checkQueenCastling = (gameMoves, board, index) => {
       }
     }
     if (
-      checkMate(index, board, player) ||
-      checkMate(index - 1, board, player) ||
-      checkMate(index - 2, board, player)
+      check(index, board, player) ||
+      check(index - 1, board, player) ||
+      check(index - 2, board, player)
     ) {
       return false;
     }
@@ -142,9 +142,9 @@ const checkQueenCastling = (gameMoves, board, index) => {
       }
     }
     if (
-      checkMate(index, board, player) ||
-      checkMate(index - 1, board, player) ||
-      checkMate(index - 2, board, player)
+      check(index, board, player) ||
+      check(index - 1, board, player) ||
+      check(index - 2, board, player)
     ) {
       return false;
     }

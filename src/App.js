@@ -59,7 +59,7 @@ const initGame = () => {
   movedWhiteKing = 0;
 };
 
-const checkMate = (board) => {
+const check = (board) => {
   // console.log(board);
   let whitePieces = [],
     blackPieces = [];
@@ -82,21 +82,21 @@ const checkMate = (board) => {
     let l = PieceMoves(blackPieces[i], board, gameMoves);
     blackMoves.push(...l);
   }
-  let checkMateWhite = 0,
-    checkMateBlack = 0;
+  let checkWhite = 0,
+    checkBlack = 0;
   // console.log(whiteMoves, blackMoves);
   for (let i = 0; i < whiteMoves.length; ++i) {
     if (board[whiteMoves[i]] === 7) {
-      checkMateBlack = 1;
+      checkBlack = 1;
     }
   }
   for (let i = 0; i < blackMoves.length; ++i) {
     if (board[blackMoves[i]] === 1) {
-      checkMateWhite = 1;
+      checkWhite = 1;
     }
   }
   // console.log(checkMateWhite, checkMateBlack);
-  return [checkMateWhite, checkMateBlack];
+  return [checkWhite, checkBlack];
 };
 
 const getPieceColor = (piece) => {
@@ -129,9 +129,6 @@ const Inside = (x, y) => {
 };
 
 const getAccessiblePositions = (index, board, lastMove) => {
-  // console.log("apelez functia");
-  // console.log(index);
-  // console.log(lastMove);
   return PieceMoves(index, board, lastMove);
 };
 
@@ -144,12 +141,11 @@ const legalMove = (prevIndex, currIndex, board) => {
   currBoard[currIndex] = currBoard[prevIndex];
   currBoard[prevIndex] = null;
 
-  let [currCheckMateWhite, currCheckMateBlack] = checkMate(currBoard);
-  // console.log(currCheckMateWhite, currCheckMateBlack);
+  let [currCheckWhite, currCheckBlack] = check(currBoard);
   if (whoMoves === 0) {
-    return !currCheckMateWhite;
+    return !currCheckWhite;
   } else {
-    return !currCheckMateBlack;
+    return !currCheckBlack;
   }
 };
 
@@ -321,15 +317,15 @@ const App = () => {
           board[1][currPositions[i]] = 1;
         }
       }
-      let [checkMateWhite, checkMateBlack] = checkMate(board[0]);
-      if (checkMateBlack === 1) {
+      let [checkWhite, checkBlack] = check(board[0]);
+      if (checkBlack === 1) {
         for (let i = 0; i < 64; ++i) {
           if (board[0][i] === 7) {
             board[1][i] = 4;
           }
         }
       }
-      if (checkMateWhite === 1) {
+      if (checkWhite === 1) {
         for (let i = 0; i < 64; ++i) {
           if (board[0][i] === 1) {
             board[1][i] = 4;

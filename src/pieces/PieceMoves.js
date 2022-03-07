@@ -1,3 +1,5 @@
+let allowCheckForCastling = true;
+
 const getPieceColor = (piece) => {
   if (piece > 6) {
     return 1;
@@ -27,7 +29,138 @@ const Inside = (x, y) => {
   return 0 <= x && x < 8 && 0 <= y && y < 8;
 };
 
-const PieceMoves = (index, board, lastMove) => {
+const checkMate = (index, board, player) => {
+  allowCheckForCastling = false;
+  let oppPieces = [];
+  let oppMoves = [];
+  for (let i = 0; i < 64; ++i) {
+    if (getPieceColor(board[i]) === 1 - player) {
+      oppPieces.push(i);
+    }
+  }
+  // console.log(whitePieces, blackPieces);
+  for (let i = 0; i < oppPieces.length; ++i) {
+    let l = PieceMoves(oppPieces[i], board);
+    oppMoves.push(...l);
+  }
+  allowCheckForCastling = true;
+
+  if (oppMoves.includes(index)) {
+    return true;
+  }
+  return false;
+};
+
+const checkKingCastling = (gameMoves, board, index) => {
+  let player = getPieceColor(board[index]);
+  if (player === 0) {
+    // white king
+    // console.log("testam ceva");
+    if (board[index + 1] !== null || board[index + 2] !== null) {
+      return false;
+    }
+    for (let i = 0; i < gameMoves.length; ++i) {
+      if (gameMoves[i][0] === 1) {
+        return false;
+      }
+      if (gameMoves[i][0] === 5 && gameMoves[i][1] === 63) {
+        return false;
+      }
+    }
+    if (
+      checkMate(index, board, player) ||
+      checkMate(index + 1, board, player) ||
+      checkMate(index + 2, board, player) 
+    ) {
+      return false;
+    }
+    return true;
+  } else {
+    if (board[index + 1] !== null || board[index + 2] !== null) {
+      return false;
+    }
+    for (let i = 0; i < gameMoves.length; ++i) {
+      if (gameMoves[i][0] === 7) {
+        return false;
+      }
+      if (gameMoves[i][0] === 11 && gameMoves[i][1] === 7) {
+        return false;
+      }
+    }
+    if (
+      checkMate(index, board, player) ||
+      checkMate(index + 1, board, player) ||
+      checkMate(index + 2, board, player)
+    ) {
+      return false;
+    }
+    return true;
+  }
+};
+
+const checkQueenCastling = (gameMoves, board, index) => {
+  let player = getPieceColor(board[index]);
+  if (player === 0) {
+    // white king
+    if (
+      board[index - 1] !== null ||
+      board[index - 2] !== null ||
+      board[index - 3]
+    ) {
+      return false;
+    }
+    for (let i = 0; i < gameMoves.length; ++i) {
+      if (gameMoves[i][0] === 1) {
+        return false;
+      }
+      if (gameMoves[i][0] === 5 && gameMoves[i][1] === 56) {
+        return false;
+      }
+    }
+    if (
+      checkMate(index, board, player) ||
+      checkMate(index - 1, board, player) ||
+      checkMate(index - 2, board, player)
+    ) {
+      return false;
+    }
+    return true;
+  } else {
+    if (
+      board[index - 1] !== null ||
+      board[index - 2] !== null ||
+      board[index - 3]
+    ) {
+      return false;
+    }
+    for (let i = 0; i < gameMoves.length; ++i) {
+      if (gameMoves[i][0] === 7) {
+        return false;
+      }
+      if (gameMoves[i][0] === 11 && gameMoves[i][1] === 0) {
+        return false;
+      }
+    }
+    if (
+      checkMate(index, board, player) ||
+      checkMate(index - 1, board, player) ||
+      checkMate(index - 2, board, player)
+    ) {
+      return false;
+    }
+    return true;
+  }
+};
+
+const PieceMoves = (index, board, gameMoves = []) => {
+  // console.log(gameMoves, gameMoves.length);
+  let lastMove = undefined;
+  if (gameMoves.length !== 0) {
+    lastMove = [
+      gameMoves[gameMoves.length - 1][1],
+      gameMoves[gameMoves.length - 1][2],
+    ];
+  }
   // console.log("inceput de piecemoves");
   // console.log(lastMove);
   // console.log(index);
@@ -54,6 +187,14 @@ const PieceMoves = (index, board, lastMove) => {
           board[newIndex] === null)
       ) {
         positions.push(newIndex);
+      }
+    }
+    if (allowCheckForCastling) {
+      if (checkKingCastling(gameMoves, board, index)) {
+        positions.push(index + 2);
+      }
+      if (checkQueenCastling(gameMoves, board, index)) {
+        positions.push(index - 2);
       }
     }
   } else if (piece === 2) {

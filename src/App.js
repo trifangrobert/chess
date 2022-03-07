@@ -8,6 +8,10 @@ const emptyBoard = () => {
 
 let whoMoves = 0;
 let lastMove = [null, null];
+let movedWhiteKing = 0;
+let movedBlackKing = 0;
+
+let gameMoves = [];
 
 const initBoard = () => {
   /* 
@@ -39,10 +43,20 @@ const initBoard = () => {
   board[0][56] = board[0][63] = 5; // white rook
   board[0][0] = board[0][7] = 11; // black rook
 
+  // board[0][28] = 8;
+
+  // board[0][26] = 1;
+  // board[0][29] = 7;
+
   // board[0][41] = 2;
   // board[0][17] = 12;
 
   return board;
+};
+
+const initGame = () => {
+  movedBlackKing = 0;
+  movedWhiteKing = 0;
 };
 
 const checkMate = (board) => {
@@ -61,11 +75,11 @@ const checkMate = (board) => {
   let whiteMoves = [],
     blackMoves = [];
   for (let i = 0; i < whitePieces.length; ++i) {
-    let l = PieceMoves(whitePieces[i], board, undefined);
+    let l = PieceMoves(whitePieces[i], board, gameMoves);
     whiteMoves.push(...l);
   }
   for (let i = 0; i < blackPieces.length; ++i) {
-    let l = PieceMoves(blackPieces[i], board, undefined);
+    let l = PieceMoves(blackPieces[i], board, gameMoves);
     blackMoves.push(...l);
   }
   let checkMateWhite = 0,
@@ -140,16 +154,16 @@ const legalMove = (prevIndex, currIndex, board) => {
 };
 
 const checkEnPassant = (index, board, lastMove, move) => {
-  console.log("verific en passant");
-  console.log("lastMove and move");
-  console.log(lastMove, move, index);
+  // console.log("verific en passant");
+  // console.log("lastMove and move");
+  // console.log(lastMove, move, index);
   let [x, y] = getPos(index);
   let piece = board[move[0]];
   let player = 0;
   let dx;
   let [x1, y1] = getPos(move[0]);
   let [x2, y2] = getPos(move[1]);
-  console.log(y1, y2);
+  // console.log(y1, y2);
   if (piece > 6) {
     piece -= 6;
     player = 1;
@@ -159,15 +173,15 @@ const checkEnPassant = (index, board, lastMove, move) => {
   } else {
     dx = 1;
   }
-  console.log(piece);
+  // console.log(piece);
   if (piece !== 6) {
     return false;
   }
-  console.log("ce se intampla doctore?");
+  // console.log("ce se intampla doctore?");
   if (player === 1 && x === 5) {
     let oldPos = getPos(lastMove[0]);
     let newPos = getPos(lastMove[1]);
-    console.log("se intampla ceva?");
+    // console.log("se intampla ceva?");
     if (
       board[lastMove[1]] === 6 &&
       Math.abs(newPos[0] - oldPos[0]) === 2 &&
@@ -180,7 +194,7 @@ const checkEnPassant = (index, board, lastMove, move) => {
   if (player === 0 && x === 2) {
     let oldPos = getPos(lastMove[0]);
     let newPos = getPos(lastMove[1]);
-    console.log("se intampla ceva?");
+    // console.log("se intampla ceva?");
     if (
       board[lastMove[1]] === 12 &&
       Math.abs(newPos[0] - oldPos[0]) === 2 &&
@@ -193,7 +207,18 @@ const checkEnPassant = (index, board, lastMove, move) => {
   return false;
 };
 
+const checkCastling = (index, board, move) => {
+  console.log("checking for castling");
+  console.log(board);
+  console.log(index);
+  if (getPiece(board[index]) === 1 && Math.abs(move[1] - move[0]) === 2) {
+    return true;
+  }
+  return false;
+};
+
 const App = () => {
+  initGame();
   const [chessBoard, setChessBoard] = useState(initBoard());
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [positions, setPositions] = useState([]);
@@ -224,7 +249,11 @@ const App = () => {
       } else {
         if (getPieceColor(chessBoard[0][index]) === whoMoves) {
           // console.log(lastMove);
-          currPositions = getAccessiblePositions(index, chessBoard[0], lastMove);
+          currPositions = getAccessiblePositions(
+            index,
+            chessBoard[0],
+            gameMoves
+          );
           setPositions(currPositions);
           setSelectedPiece(index);
         } else {
@@ -239,7 +268,10 @@ const App = () => {
     setChessBoard((prevState) => {
       let board = emptyBoard();
       // console.log(whoMoves);
-      if (prevState[0][index] !== null && getPieceColor(prevState[0][index]) === whoMoves) {
+      if (
+        prevState[0][index] !== null &&
+        getPieceColor(prevState[0][index]) === whoMoves
+      ) {
         board[1][index] = 3;
       }
       for (let i = 0; i < 64; ++i) {
@@ -247,27 +279,35 @@ const App = () => {
       }
       // console.log(move);
       if (move !== null) {
+        let currPiece = board[0][move[0]];
         if (checkEnPassant(index, chessBoard[0], lastMove, move)) {
-          console.log("en passant");
+          // console.log("en passant");
           // console.log(lastMove);
-          let dx;
-          if (getPieceColor(board[index]) === 0) {
-            dx = -1;
-          }
-          else {
-            dx = 1;
-          }
-
           board[0][move[1]] = board[0][move[0]];
           board[0][move[0]] = null;
           board[0][lastMove[1]] = null;
           board[1][move[1]] = null;
-
+        } else if (checkCastling(move[0], chessBoard[0], move)) {
+          console.log("castling");
+          if (move[1] > move[0]) {
+            board[0][move[1]] = board[0][move[0]];
+            board[0][move[0]] = null;
+            board[0][move[1] - 1] = board[0][move[1] + 1];
+            board[0][move[1] + 1] = null;
+          } else {
+            console.log("queen side");
+            board[0][move[1]] = board[0][move[0]];
+            board[0][move[0]] = null;
+            board[0][move[1] + 1] = board[0][move[1] - 2];
+            board[0][move[1] - 2] = null;
+          }
         } else {
           board[0][move[1]] = board[0][move[0]];
           board[0][move[0]] = null;
           board[1][move[1]] = null;
         }
+        gameMoves.push([currPiece, move[0], move[1], board[0]]);
+        // console.log(gameMoves);
 
         // board[0][move[1]] = board[0][move[0]];
         // board[0][move[0]] = null;

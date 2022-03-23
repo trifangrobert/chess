@@ -7,22 +7,23 @@ const emptyBoard = () => {
 };
 
 const legalMove = (prevIndex, currIndex, board) => {
-  console.log("legal move check");
+  // console.log("legal move check");
   let player = getPieceColor(board[prevIndex]);
   let nextBoard = emptyBoard();
   for (let i = 0; i < 64; ++i) {
     nextBoard[i] = board[i];
   }
   nextBoard = doMove(nextBoard, [prevIndex, currIndex], currIndex, lastMove);
+  // console.log(1 - player);
   let attackedPos = AttackedPositions(
     nextBoard,
-    1 - getPieceColor(board[prevIndex])
+    1 - player
   );
   for (let i = 0; i < attackedPos.length; ++i) {
     let p = attackedPos[i];
     if (
       getPiece(nextBoard[p]) === 1 &&
-      getPieceColor(nextBoard[p]) === 1 - player
+      getPieceColor(nextBoard[p]) === player
     ) {
       return false;
     }
@@ -152,7 +153,7 @@ const PieceMoves = (index, board, gameMoves = []) => {
     player = 1;
   }
   if (piece === 1) {
-    console.log("MORTII REGELUI MA_TII");
+    // console.log("MORTII REGELUI MA_TII");
     // king
     let i, j;
     let dx = [0, 0, -1, 1, -1, -1, 1, 1];
@@ -177,7 +178,7 @@ const PieceMoves = (index, board, gameMoves = []) => {
       positions.push(index - 2);
     }
   } else if (piece === 2) {
-    console.log("MORTII REGINEI MA_TII");
+    // console.log("MORTII REGINEI MA_TII");
     // queen
     let i, j;
     let dx = [0, 0, -1, 1, -1, -1, 1, 1];
@@ -204,7 +205,7 @@ const PieceMoves = (index, board, gameMoves = []) => {
       }
     }
   } else if (piece === 3) {
-    console.log("MORTII NEBUNULUI MA_TII");
+    // console.log("MORTII NEBUNULUI MA_TII");
     // bishop
     let i, j;
     let dx = [-1, -1, 1, 1];
@@ -231,7 +232,7 @@ const PieceMoves = (index, board, gameMoves = []) => {
       }
     }
   } else if (piece === 4) {
-    console.log("MORTII CALULUI MA_TII");
+    // console.log("MORTII CALULUI MA_TII");
     // knight
     let dx = [-2, -1, +1, +2, +2, +1, -1, -2];
     let dy = [+1, +2, +2, +1, -1, -2, -2, -1];
@@ -249,7 +250,7 @@ const PieceMoves = (index, board, gameMoves = []) => {
       }
     }
   } else if (piece === 5) {
-    console.log("MORTII TURII MA_TII");
+    // console.log("MORTII TURII MA_TII");
     // rook
     let i, j;
     let dx = [0, 0, -1, 1];
@@ -276,7 +277,7 @@ const PieceMoves = (index, board, gameMoves = []) => {
       }
     }
   } else if (piece === 6) {
-    console.log("VERIFIC PIONU");
+    // console.log("VERIFIC PIONU");
     // pawn
     let dx;
     if (player === 0) {

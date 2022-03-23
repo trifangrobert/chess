@@ -26,30 +26,30 @@ const initBoard = () => {
   1-6 white, 7-12 black
   */
   let board = emptyBoard();
-  for (let i = 0; i < 8; i++) {
-    board[0][48 + i] = 6; // white pawn
-    board[0][8 + i] = 12; //black pawn
-  }
-  board[0][60] = 1; // white king
-  board[0][4] = 7; // black king
+  // for (let i = 0; i < 8; i++) {
+  //   board[0][48 + i] = 6; // white pawn
+  //   board[0][8 + i] = 12; //black pawn
+  // }
+  // board[0][60] = 1; // white king
+  // board[0][4] = 7; // black king
 
-  board[0][59] = 2; // white queen
-  board[0][3] = 8; // black queen
+  // board[0][59] = 2; // white queen
+  // board[0][3] = 8; // black queen
 
-  board[0][58] = board[0][61] = 3; // white bishop
-  board[0][2] = board[0][5] = 9; // black queen
+  // board[0][58] = board[0][61] = 3; // white bishop
+  // board[0][2] = board[0][5] = 9; // black queen
 
-  board[0][57] = board[0][62] = 4; // white knight
-  board[0][1] = board[0][6] = 10; // black knight
+  // board[0][57] = board[0][62] = 4; // white knight
+  // board[0][1] = board[0][6] = 10; // black knight
 
-  board[0][56] = board[0][63] = 5; // white rook
-  board[0][0] = board[0][7] = 11; // black rook
+  // board[0][56] = board[0][63] = 5; // white rook
+  // board[0][0] = board[0][7] = 11; // black rook
 
-  // board[0][0] = 5;
-  // board[0][2] = 5;
-  // board[0][47] = 5;
-  // board[0][63] = 5;
-  // board[0][49] = 7;
+  board[0][0] = 5;
+  board[0][2] = 5;
+  board[0][47] = 5;
+  board[0][63] = 5;
+  board[0][49] = 7;
 
   // board[0][28] = 8;
 
@@ -78,118 +78,145 @@ const check = (board) => {
       blackPieces.push(i);
     }
   }
+  // console.log("check for check");
   // console.log(board);
   // console.log(whitePieces, blackPieces);
-  let whiteMoves = [],
-    blackMoves = [];
-  for (let i = 0; i < whitePieces.length; ++i) {
-    let l = AttackedPositions(whitePieces[i], board);
-    whiteMoves.push(...l);
-  }
-  for (let i = 0; i < blackPieces.length; ++i) {
-    let l = AttackedPositions(blackPieces[i], board);
-    blackMoves.push(...l);
-  }
-  let checkWhite = 0,
-    checkBlack = 0;
+  let whiteMoves = AttackedPositions(board, 0);
+  let blackMoves = AttackedPositions(board, 1);
+  let checkWhite = false,
+    checkBlack = false;
   // console.log(whiteMoves, blackMoves);
   for (let i = 0; i < whiteMoves.length; ++i) {
     if (board[whiteMoves[i]] === 7) {
-      checkBlack = 1;
+      checkBlack = true;
     }
   }
   for (let i = 0; i < blackMoves.length; ++i) {
     if (board[blackMoves[i]] === 1) {
-      checkWhite = 1;
+      checkWhite = true;
     }
   }
-  // console.log(checkMateWhite, checkMateBlack);
+  // console.log(checkWhite, checkBlack);
   return [checkWhite, checkBlack];
 };
 
-// const checkMate = (board, player) => {
-//   if (player === 0) {
-//     let whitePieces = [];
-//     for (let i = 0; i < 64; ++i) {
-//       if (getPieceColor(board[i]) === 0) {
-//         whitePieces.push(i);
-//       }
-//     }
-//     for (let i = 0; i < whitePieces.length; ++i) {
-//       let l = PieceMoves(whitePieces[i], board, gameMoves);
-//       let newBoard = emptyBoard();
-//       //TODO
-//     }
-//   } else {
-//     let blackPieces = [];
-//     for (let i = 0; i < 64; ++i) {
-//       if (getPieceColor(board[i]) === 1) {
-//         blackPieces.push(i);
-//       }
-//     }
-//     let blackMoves = [];
-//     for (let i = 0; i < blackPieces.length; ++i) {
-//       let l = PieceMoves(blackPieces[i], board, gameMoves);
-//       blackMoves.push(...l);
-//     }
-//   }
-// };
+const checkMate = (board, player) => {
+  if (player === 0) {
+    let whitePieces = [];
+    for (let i = 0; i < 64; ++i) {
+      if (getPieceColor(board[i]) === 0) {
+        whitePieces.push(i);
+      }
+    }
+    for (let i = 0; i < whitePieces.length; ++i) {
+      let l = PieceMoves(whitePieces[i], board, gameMoves);
+      for (let j = 0; j < l.length; ++j) {
+        let nextBoard = emptyBoard();
+        for (let i = 0; i < 64; ++i) {
+          nextBoard[i] = board[i];
+        }
+        nextBoard = doMove(
+          nextBoard,
+          [whitePieces[i], l[j]],
+          l[j],
+          lastMove
+        );
+        let [checkWhite, checkBlack] = check(nextBoard);
+        if (checkWhite === 0) {
+          return false;
+        }
+      }
+    }
+    return true;
+  } else {
+    let blackPieces = [];
+    for (let i = 0; i < 64; ++i) {
+      if (getPieceColor(board[i]) === 1) {
+        blackPieces.push(i);
+      }
+    }
+    let blackMoves = [];
+    for (let i = 0; i < blackPieces.length; ++i) {
+      let l = PieceMoves(blackPieces[i], board, gameMoves);
+      for (let j = 0; j < l.length; ++j) {
+        let nextBoard = emptyBoard();
+        for (let i = 0; i < 64; ++i) {
+          nextBoard[i] = board[i];
+        }
+        nextBoard = doMove(
+          nextBoard,
+          [blackPieces[i], l[j]],
+          l[j],
+          lastMove
+        );
+        let [checkWhite, checkBlack] = check(nextBoard);
+        if (checkBlack === 0) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+};
 
-// const staleMate = (board, player) => {
-//   let whitePieces = [],
-//     blackPieces = [];
-//   for (let i = 0; i < 64; ++i) {
-//     if (getPieceColor(board[i]) === 0) {
-//       whitePieces.push(i);
-//     }
-//     if (getPieceColor(board[i]) === 1) {
-//       blackPieces.push(i);
-//     }
-//   }
+const staleMate = (board, player) => {
+  let whitePieces = [],
+    blackPieces = [];
+  for (let i = 0; i < 64; ++i) {
+    if (getPieceColor(board[i]) === 0) {
+      whitePieces.push(i);
+    }
+    if (getPieceColor(board[i]) === 1) {
+      blackPieces.push(i);
+    }
+  }
 
-//   // console.log(whitePieces, blackPieces);
-//   let whiteMoves = [],
-//     blackMoves = [];
-//   for (let i = 0; i < whitePieces.length; ++i) {
-//     let l = PieceMoves(whitePieces[i], board, gameMoves);
-//     whiteMoves.push(...l);
-//   }
-//   for (let i = 0; i < blackPieces.length; ++i) {
-//     let l = PieceMoves(blackPieces[i], board, gameMoves);
-//     blackMoves.push(...l);
-//   }
-//   let [checkWhite, checkBlack] = check(board);
-//   // console.log(whiteMoves, blackMoves);
-//   if (player === 0) {
-//     if (checkWhite === false && whiteMoves.length === 0) {
-//       return true;
-//     }
-//     return false;
-//   } else {
-//     if (checkBlack === true && blackMoves.length === 0) {
-//       return true;
-//     }
-//     return false;
-//   }
-// };
+  console.log(whitePieces, blackPieces);
+  let whiteMoves = [],
+    blackMoves = [];
+  for (let i = 0; i < whitePieces.length; ++i) {
+    let l = PieceMoves(whitePieces[i], board, gameMoves);
+    whiteMoves.push(...l);
+  }
+  for (let i = 0; i < blackPieces.length; ++i) {
+    let l = PieceMoves(blackPieces[i], board, gameMoves);
+    blackMoves.push(...l);
+  }
+  let [checkWhite, checkBlack] = check(board);
+  console.log(whiteMoves, blackMoves);
+  console.log(checkWhite, checkBlack);
+  console.log(player);
+  if (player === 0) {
+    if (checkWhite === false && whiteMoves.length === 0) {
+      return true;
+    }
+    return false;
+  } else {
+    if (checkBlack === false && blackMoves.length === 0) {
+      return true;
+    }
+    return false;
+  }
+};
 
-// const endGame = (board, player) => {
-//   if (staleMate(board, player)) {
-//     console.log("stalemate");
-//     return 2;
-//   }
-//   let [checkWhite, checkBlack] = check(board);
-//   if (player === 0 && checkWhite === false) {
-//     return 0;
-//   }
-//   if (player === 1 && checkBlack === false) {
-//     return 0;
-//   }
-//   if (checkMate(board, player)) {
-//     return 1;
-//   }
-//   return 0;
-// };
+const endGame = (board, player) => {
+  if (staleMate(board, player)) {
+    console.log("stalemate");
+    return 2;
+  }
+  let [checkWhite, checkBlack] = check(board);
+  if (player === 0 && checkWhite === false) {
+    return 0;
+  }
+  if (player === 1 && checkBlack === false) {
+    return 0;
+  }
+  if (checkMate(board, player)) {
+    console.log("checkmate");
+    return 1;
+  }
+  return 0;
+};
 
 const App = () => {
   initGame();
@@ -253,7 +280,7 @@ const App = () => {
         board[1][move[1]] = null;
         board[1][lastMove[0]] = 5;
         board[1][lastMove[1]] = 5;
-        // endGame(board[0], 1 - player);
+        endGame(board[0], 1 - player);
       }
       for (let i = 0; i < currPositions.length; ++i) {
         if (prevState[0][currPositions[i]] !== null) {
@@ -263,14 +290,14 @@ const App = () => {
         }
       }
       let [checkWhite, checkBlack] = check(board[0]);
-      if (checkBlack === 1) {
+      if (checkBlack === true) {
         for (let i = 0; i < 64; ++i) {
           if (board[0][i] === 7) {
             board[1][i] = 4;
           }
         }
       }
-      if (checkWhite === 1) {
+      if (checkWhite === true) {
         for (let i = 0; i < 64; ++i) {
           if (board[0][i] === 1) {
             board[1][i] = 4;

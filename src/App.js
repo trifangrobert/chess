@@ -45,8 +45,8 @@ const initBoard = () => {
   // board[0][56] = board[0][63] = 5; // white rook
   // board[0][0] = board[0][7] = 11; // black rook
 
-  board[0][0] = 5;
-  board[0][2] = 5;
+  // board[0][0] = 5;
+  // board[0][2] = 5;
   board[0][47] = 5;
   board[0][63] = 5;
   board[0][49] = 7;
@@ -122,7 +122,7 @@ const checkMate = (board, player) => {
           lastMove
         );
         let [checkWhite, checkBlack] = check(nextBoard);
-        if (checkWhite === 0) {
+        if (checkWhite === false) {
           return false;
         }
       }
@@ -135,14 +135,15 @@ const checkMate = (board, player) => {
         blackPieces.push(i);
       }
     }
-    let blackMoves = [];
     for (let i = 0; i < blackPieces.length; ++i) {
       let l = PieceMoves(blackPieces[i], board, gameMoves);
+      console.log(l);
       for (let j = 0; j < l.length; ++j) {
         let nextBoard = emptyBoard();
-        for (let i = 0; i < 64; ++i) {
-          nextBoard[i] = board[i];
+        for (let k = 0; k < 64; ++k) {
+          nextBoard[k] = board[k];
         }
+        console.log(nextBoard);
         nextBoard = doMove(
           nextBoard,
           [blackPieces[i], l[j]],
@@ -150,7 +151,7 @@ const checkMate = (board, player) => {
           lastMove
         );
         let [checkWhite, checkBlack] = check(nextBoard);
-        if (checkBlack === 0) {
+        if (checkBlack === false) {
           return false;
         }
       }
@@ -171,7 +172,7 @@ const staleMate = (board, player) => {
     }
   }
 
-  console.log(whitePieces, blackPieces);
+  // console.log(whitePieces, blackPieces);
   let whiteMoves = [],
     blackMoves = [];
   for (let i = 0; i < whitePieces.length; ++i) {
@@ -183,9 +184,9 @@ const staleMate = (board, player) => {
     blackMoves.push(...l);
   }
   let [checkWhite, checkBlack] = check(board);
-  console.log(whiteMoves, blackMoves);
-  console.log(checkWhite, checkBlack);
-  console.log(player);
+  // console.log(whiteMoves, blackMoves);
+  // console.log(checkWhite, checkBlack);
+  // console.log(player);
   if (player === 0) {
     if (checkWhite === false && whiteMoves.length === 0) {
       return true;

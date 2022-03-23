@@ -1,5 +1,6 @@
 import checkEnPassant from "./EnPassant";
 import checkCastling from "./Castling";
+import checkPawnPromotion from "./PawnPromotion";
 
 const doMove = (board, move, index, lastMove) => {
   if (checkEnPassant(index, board, move, lastMove)) {
@@ -22,7 +23,11 @@ const doMove = (board, move, index, lastMove) => {
       board[move[1] + 1] = board[move[1] - 2];
       board[move[1] - 2] = null;
     }
-  } else {
+  } 
+  else if (checkPawnPromotion(move)) {
+    ;
+  }
+  else {
     board[move[1]] = board[move[0]];
     board[move[0]] = null;
   }

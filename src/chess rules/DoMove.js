@@ -24,8 +24,9 @@ const doMove = (board, move, index, lastMove) => {
       board[move[1] - 2] = null;
     }
   } 
-  else if (checkPawnPromotion(move)) {
-    ;
+  else if (checkPawnPromotion(board, move)) {
+    board[move[1]] = board[move[0]] - 4;
+    board[move[0]] = null;
   }
   else {
     board[move[1]] = board[move[0]];

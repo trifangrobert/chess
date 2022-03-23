@@ -12,7 +12,6 @@ const emptyBoard = () => {
 
 let whoMoves = 0;
 let lastMove = [null, null];
-
 let gameMoves = [];
 
 const initBoard = () => {
@@ -26,30 +25,32 @@ const initBoard = () => {
   1-6 white, 7-12 black
   */
   let board = emptyBoard();
-  // for (let i = 0; i < 8; i++) {
-  //   board[0][48 + i] = 6; // white pawn
-  //   board[0][8 + i] = 12; //black pawn
-  // }
-  // board[0][60] = 1; // white king
-  // board[0][4] = 7; // black king
+  for (let i = 0; i < 8; i++) {
+    board[0][48 + i] = 6; // white pawn
+    board[0][8 + i] = 12; //black pawn
+  }
+  board[0][60] = 1; // white king
+  board[0][4] = 7; // black king
 
-  // board[0][59] = 2; // white queen
-  // board[0][3] = 8; // black queen
+  board[0][59] = 2; // white queen
+  board[0][3] = 8; // black queen
 
-  // board[0][58] = board[0][61] = 3; // white bishop
-  // board[0][2] = board[0][5] = 9; // black queen
+  board[0][58] = board[0][61] = 3; // white bishop
+  board[0][2] = board[0][5] = 9; // black queen
 
-  // board[0][57] = board[0][62] = 4; // white knight
-  // board[0][1] = board[0][6] = 10; // black knight
+  board[0][57] = board[0][62] = 4; // white knight
+  board[0][1] = board[0][6] = 10; // black knight
 
-  // board[0][56] = board[0][63] = 5; // white rook
-  // board[0][0] = board[0][7] = 11; // black rook
+  board[0][56] = board[0][63] = 5; // white rook
+  board[0][0] = board[0][7] = 11; // black rook
 
+
+  // board[0][40] = 12;
   // board[0][0] = 5;
-  // board[0][2] = 5;
-  board[0][47] = 5;
-  board[0][63] = 5;
-  board[0][49] = 7;
+  // board[0][3] = 5;
+  // board[0][47] = 5;
+  // board[0][63] = 5;
+  // board[0][49] = 7;
 
   // board[0][28] = 8;
 

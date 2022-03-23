@@ -1,61 +1,39 @@
-let allowCheckForCastling = true;
+import doMove from "../chess rules/DoMove";
+import AttackedPositions from "./Moves/AttackedPositions";
+import {getPiece, getPieceColor, getIndex, getPos, Inside} from "../useful functions/PieceFunctions";
 
-const getPieceColor = (piece) => {
-  if (piece > 6) {
-    return 1;
-  }
-  if (piece > 0) {
-    return 0;
-  }
-  return -1;
+const emptyBoard = () => {
+  return [new Array(64).fill(null), new Array(64).fill(null)];
 };
 
-const getPiece = (piece) => {
-  if (piece > 6) {
-    return piece - 6;
-  }
-  return piece;
-};
-
-const getIndex = (x, y) => {
-  return 8 * x + y;
-};
-
-const getPos = (index) => {
-  return [Math.floor(index / 8), index % 8];
-};
-
-const Inside = (x, y) => {
-  return 0 <= x && x < 8 && 0 <= y && y < 8;
-};
-
-const check = (index, board, player) => {
-  allowCheckForCastling = false;
-  let oppPieces = [];
-  let oppMoves = [];
+const legalMove = (prevIndex, currIndex, board) => {
+  console.log("legal move check");
+  let player = getPieceColor(board[prevIndex]);
+  let nextBoard = emptyBoard();
   for (let i = 0; i < 64; ++i) {
-    if (getPieceColor(board[i]) === 1 - player) {
-      oppPieces.push(i);
+    nextBoard[i] = board[i];
+  }
+  nextBoard = doMove(nextBoard, [prevIndex, currIndex], currIndex, lastMove);
+  let attackedPos = AttackedPositions(
+    nextBoard,
+    1 - getPieceColor(board[prevIndex])
+  );
+  for (let i = 0; i < attackedPos.length; ++i) {
+    let p = attackedPos[i];
+    if (
+      getPiece(nextBoard[p]) === 1 &&
+      getPieceColor(nextBoard[p]) === 1 - player
+    ) {
+      return false;
     }
   }
-  // console.log(whitePieces, blackPieces);
-  for (let i = 0; i < oppPieces.length; ++i) {
-    let l = PieceMoves(oppPieces[i], board);
-    oppMoves.push(...l);
-  }
-  allowCheckForCastling = true;
-
-  if (oppMoves.includes(index)) {
-    return true;
-  }
-  return false;
+  return true;
 };
 
 const checkKingCastling = (gameMoves, board, index) => {
   let player = getPieceColor(board[index]);
   if (player === 0) {
     // white king
-    // console.log("testam ceva");
     if (board[index + 1] !== null || board[index + 2] !== null) {
       return false;
     }
@@ -67,10 +45,11 @@ const checkKingCastling = (gameMoves, board, index) => {
         return false;
       }
     }
+    let positions = AttackedPositions(board, 1 - player);
     if (
-      check(index, board, player) ||
-      check(index + 1, board, player) ||
-      check(index + 2, board, player) 
+      positions.includes(index) ||
+      positions.includes(index + 1) ||
+      positions.includes(index + 2)
     ) {
       return false;
     }
@@ -87,10 +66,11 @@ const checkKingCastling = (gameMoves, board, index) => {
         return false;
       }
     }
+    let positions = AttackedPositions(board, 1 - player);
     if (
-      check(index, board, player) ||
-      check(index + 1, board, player) ||
-      check(index + 2, board, player)
+      positions.includes(index) ||
+      positions.includes(index + 1) ||
+      positions.includes(index + 2)
     ) {
       return false;
     }
@@ -117,10 +97,11 @@ const checkQueenCastling = (gameMoves, board, index) => {
         return false;
       }
     }
+    let positions = AttackedPositions(board, 1 - player);
     if (
-      check(index, board, player) ||
-      check(index - 1, board, player) ||
-      check(index - 2, board, player)
+      positions.includes(index) ||
+      positions.includes(index - 1) ||
+      positions.includes(index - 2)
     ) {
       return false;
     }
@@ -141,10 +122,11 @@ const checkQueenCastling = (gameMoves, board, index) => {
         return false;
       }
     }
+    let positions = AttackedPositions(board, 1 - player);
     if (
-      check(index, board, player) ||
-      check(index - 1, board, player) ||
-      check(index - 2, board, player)
+      positions.includes(index) ||
+      positions.includes(index - 1) ||
+      positions.includes(index - 2)
     ) {
       return false;
     }
@@ -152,18 +134,15 @@ const checkQueenCastling = (gameMoves, board, index) => {
   }
 };
 
+let lastMove = undefined;
+
 const PieceMoves = (index, board, gameMoves = []) => {
-  // console.log(gameMoves, gameMoves.length);
-  let lastMove = undefined;
   if (gameMoves.length !== 0) {
     lastMove = [
       gameMoves[gameMoves.length - 1][1],
       gameMoves[gameMoves.length - 1][2],
     ];
   }
-  // console.log("inceput de piecemoves");
-  // console.log(lastMove);
-  // console.log(index);
   let [x, y] = getPos(index);
   let piece = board[index];
   let player = 0;
@@ -173,6 +152,7 @@ const PieceMoves = (index, board, gameMoves = []) => {
     player = 1;
   }
   if (piece === 1) {
+    console.log("MORTII REGELUI MA_TII");
     // king
     let i, j;
     let dx = [0, 0, -1, 1, -1, -1, 1, 1];
@@ -184,20 +164,20 @@ const PieceMoves = (index, board, gameMoves = []) => {
       if (
         Inside(i, j) &&
         (getPieceColor(board[index]) !== getPieceColor(board[newIndex]) ||
-          board[newIndex] === null)
+          board[newIndex] === null) &&
+        legalMove(getIndex(x, y), getIndex(i, j), board)
       ) {
         positions.push(newIndex);
       }
     }
-    if (allowCheckForCastling) {
-      if (checkKingCastling(gameMoves, board, index)) {
-        positions.push(index + 2);
-      }
-      if (checkQueenCastling(gameMoves, board, index)) {
-        positions.push(index - 2);
-      }
+    if (checkKingCastling(gameMoves, board, index)) {
+      positions.push(index + 2);
+    }
+    if (checkQueenCastling(gameMoves, board, index)) {
+      positions.push(index - 2);
     }
   } else if (piece === 2) {
+    console.log("MORTII REGINEI MA_TII");
     // queen
     let i, j;
     let dx = [0, 0, -1, 1, -1, -1, 1, 1];
@@ -207,7 +187,9 @@ const PieceMoves = (index, board, gameMoves = []) => {
       j = y + dy[d];
       let newIndex = getIndex(i, j);
       while (Inside(i, j) && board[newIndex] === null) {
-        positions.push(newIndex);
+        if (legalMove(getIndex(x, y), getIndex(i, j), board)) {
+          positions.push(newIndex);
+        }
         i += dx[d];
         j += dy[d];
         newIndex = getIndex(i, j);
@@ -215,12 +197,14 @@ const PieceMoves = (index, board, gameMoves = []) => {
       if (
         Inside(i, j) &&
         board[newIndex] !== null &&
-        getPieceColor(board[index]) !== getPieceColor(board[newIndex])
+        getPieceColor(board[index]) !== getPieceColor(board[newIndex]) &&
+        legalMove(getIndex(x, y), getIndex(i, j), board)
       ) {
         positions.push(newIndex);
       }
     }
   } else if (piece === 3) {
+    console.log("MORTII NEBUNULUI MA_TII");
     // bishop
     let i, j;
     let dx = [-1, -1, 1, 1];
@@ -230,7 +214,9 @@ const PieceMoves = (index, board, gameMoves = []) => {
       j = y + dy[d];
       let newIndex = getIndex(i, j);
       while (Inside(i, j) && board[newIndex] === null) {
-        positions.push(newIndex);
+        if (legalMove(getIndex(x, y), getIndex(i, j), board)) {
+          positions.push(newIndex);
+        }
         i += dx[d];
         j += dy[d];
         newIndex = getIndex(i, j);
@@ -238,38 +224,32 @@ const PieceMoves = (index, board, gameMoves = []) => {
       if (
         Inside(i, j) &&
         board[newIndex] !== null &&
-        getPieceColor(board[index]) !== getPieceColor(board[newIndex])
+        getPieceColor(board[index]) !== getPieceColor(board[newIndex]) &&
+        legalMove(getIndex(x, y), getIndex(i, j), board)
       ) {
         positions.push(newIndex);
       }
     }
   } else if (piece === 4) {
+    console.log("MORTII CALULUI MA_TII");
     // knight
-    let diff = [
-      [-2, +1],
-      [-1, +2],
-      [+1, +2],
-      [+2, +1],
-      [+2, -1],
-      [+1, -2],
-      [-1, -2],
-      [-2, -1],
-    ];
-    for (let i = 0; i < diff.length; i++) {
-      let newx = x + diff[i][0];
-      let newy = y + diff[i][1];
-      let newIndex = getIndex(newx, newy);
+    let dx = [-2, -1, +1, +2, +2, +1, -1, -2];
+    let dy = [+1, +2, +2, +1, -1, -2, -2, -1];
+    for (let k = 0; k < 8; k++) {
+      let i, j;
+      i = x + dx[k];
+      j = y + dy[k];
+      let newIndex = getIndex(i, j);
       if (
-        0 <= newx &&
-        newx < 8 &&
-        0 <= newy &&
-        newy < 8 &&
-        getPieceColor(board[index]) !== getPieceColor(board[newIndex])
+        Inside(i, j) &&
+        getPieceColor(board[index]) !== getPieceColor(board[newIndex]) &&
+        legalMove(getIndex(x, y), getIndex(i, j), board)
       ) {
         positions.push(newIndex);
       }
     }
   } else if (piece === 5) {
+    console.log("MORTII TURII MA_TII");
     // rook
     let i, j;
     let dx = [0, 0, -1, 1];
@@ -279,7 +259,9 @@ const PieceMoves = (index, board, gameMoves = []) => {
       j = y + dy[d];
       let newIndex = getIndex(i, j);
       while (Inside(i, j) && board[newIndex] === null) {
-        positions.push(newIndex);
+        if (legalMove(getIndex(x, y), getIndex(i, j), board)) {
+          positions.push(newIndex);
+        }
         i += dx[d];
         j += dy[d];
         newIndex = getIndex(i, j);
@@ -287,12 +269,14 @@ const PieceMoves = (index, board, gameMoves = []) => {
       if (
         Inside(i, j) &&
         board[newIndex] !== null &&
-        getPieceColor(board[index]) !== getPieceColor(board[newIndex])
+        getPieceColor(board[index]) !== getPieceColor(board[newIndex]) &&
+        legalMove(getIndex(x, y), getIndex(i, j), board)
       ) {
         positions.push(newIndex);
       }
     }
   } else if (piece === 6) {
+    console.log("VERIFIC PIONU");
     // pawn
     let dx;
     if (player === 0) {
@@ -308,7 +292,8 @@ const PieceMoves = (index, board, gameMoves = []) => {
     if (
       Inside(i, j) &&
       board[newIndex] !== null &&
-      getPieceColor(board[index]) !== getPieceColor(board[newIndex])
+      getPieceColor(board[index]) !== getPieceColor(board[newIndex]) &&
+      legalMove(getIndex(x, y), getIndex(i, j), board)
     ) {
       positions.push(newIndex);
     }
@@ -319,7 +304,8 @@ const PieceMoves = (index, board, gameMoves = []) => {
     if (
       Inside(i, j) &&
       board[newIndex] !== null &&
-      getPieceColor(board[index]) !== getPieceColor(board[newIndex])
+      getPieceColor(board[index]) !== getPieceColor(board[newIndex]) &&
+      legalMove(getIndex(x, y), getIndex(i, j), board)
     ) {
       positions.push(newIndex);
     }
@@ -327,7 +313,11 @@ const PieceMoves = (index, board, gameMoves = []) => {
     i = x + dx;
     j = y;
     newIndex = getIndex(i, j);
-    if (Inside(i, j) && board[newIndex] === null) {
+    if (
+      Inside(i, j) &&
+      board[newIndex] === null &&
+      legalMove(getIndex(x, y), getIndex(i, j), board)
+    ) {
       positions.push(newIndex);
     }
 
@@ -335,16 +325,21 @@ const PieceMoves = (index, board, gameMoves = []) => {
     let ii = x + 2 * dx;
     j = y;
     newIndex = getIndex(ii, j);
-    // console.log(x);
     if (player === 0 && x === 6) {
-      // console.log(i, j);
-      // console.log(ii, j);
-      if (board[getIndex(i, j)] === null && board[newIndex] === null) {
+      if (
+        board[getIndex(i, j)] === null &&
+        board[newIndex] === null &&
+        legalMove(getIndex(x, y), getIndex(ii, j), board)
+      ) {
         positions.push(newIndex);
       }
     }
     if (player === 1 && x === 1) {
-      if (board[getIndex(i, j)] === null && board[newIndex] === null) {
+      if (
+        board[getIndex(i, j)] === null &&
+        board[newIndex] === null &&
+        legalMove(getIndex(x, y), getIndex(ii, j), board)
+      ) {
         positions.push(newIndex);
       }
     }

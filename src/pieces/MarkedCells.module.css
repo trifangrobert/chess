@@ -36,10 +36,10 @@
   border-color: green;
   background-color: green;
   border-style: solid;
-  z-index: 90;
+  z-index: 91;
 }
 
-.checkmate {
+.check {
   height: 70px;
   width: 70px;
   position: absolute;
@@ -50,6 +50,21 @@
   background-color: red;
   border-width: 5px;
   border-color: red;
+  border-style: solid;
+  z-index: 90;
+}
+
+.prevmove {
+  height: 70px;
+  width: 70px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -40px 0 0 -40px;
+  border-radius: 25%;
+  background-color: yellowgreen;
+  border-width: 5px;
+  border-color: yellowgreen;
   border-style: solid;
   z-index: 90;
 }

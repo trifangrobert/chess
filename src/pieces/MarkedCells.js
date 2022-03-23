@@ -12,7 +12,10 @@ const MarkedCells = (props) => {
     name = 'selected';
   }
   else if (props.stateType === 4) {
-    name = 'checkmate';
+    name = 'check';
+  }
+  else if (props.stateType === 5) {
+    name = 'prevmove';
   }
   return <div className={classes[name]}></div>;
 };

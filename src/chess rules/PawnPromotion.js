@@ -1,6 +1,9 @@
-import { getPieceColor, getPos } from "../useful functions/PieceFunctions";
+import { getPieceColor, getPos, getPiece } from "../useful functions/PieceFunctions";
 
 const checkPawnPromotion = (board, move) => {
+    if (getPiece(board[move[0]]) !== 6) {
+        return false;
+    } 
     let player = getPieceColor(board[move[0]]);
     let [x, y] = getPos(move[1]);
     if (player === 0 && x === 0) {

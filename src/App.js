@@ -5,6 +5,8 @@ import doMove from "./chess rules/DoMove.js";
 import "./useful functions/PieceFunctions.js";
 import AttackedPositions from "./pieces/Moves/AttackedPositions.js";
 import { getPieceColor } from "./useful functions/PieceFunctions";
+import checkPawnPromotion from "./chess rules/PawnPromotion.js";
+import PawnPromotionBox from "./components/PawnPromotionBox.js";
 
 const emptyBoard = () => {
   return [new Array(64).fill(null), new Array(64).fill(null)];
@@ -275,15 +277,16 @@ const App = () => {
         let player = getPieceColor(board[0][move[0]]);
         board[1][lastMove[0]] = null;
         board[1][lastMove[1]] = null;
-        // console.log(board[0]);
         board[0] = doMove(board[0], move, index, lastMove);
-        // console.log(board[0]);
+        if (checkPawnPromotion(board, move)) {
+
+        }
         lastMove = move;
         board[1][move[1]] = null;
-        board[1][lastMove[0]] = 5;
-        board[1][lastMove[1]] = 5;
         endGame(board[0], 1 - player);
       }
+      board[1][lastMove[0]] = 5;
+      board[1][lastMove[1]] = 5;
       for (let i = 0; i < currPositions.length; ++i) {
         if (prevState[0][currPositions[i]] !== null) {
           board[1][currPositions[i]] = 2;
@@ -306,11 +309,13 @@ const App = () => {
           }
         }
       }
+      
       return board;
     });
   };
   return (
     <div>
+      {/* <PawnPromotionBox /> */}
       <Board handleClick={handleClick} board={chessBoard} />
     </div>
   );

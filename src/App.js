@@ -2,7 +2,7 @@ import { useState } from "react";
 import Board from "./components/Board.js";
 import PieceMoves from "./pieces/PieceMoves.js";
 import doMove from "./chess rules/DoMove.js";
-import {getPiece, getPos} from  "./useful functions/PieceFunctions.js";
+import { getPiece, getPos } from "./useful functions/PieceFunctions.js";
 import AttackedPositions from "./pieces/Moves/AttackedPositions.js";
 import { getPieceColor } from "./useful functions/PieceFunctions";
 import checkPawnPromotion from "./chess rules/PawnPromotion.js";
@@ -205,7 +205,7 @@ let currMove;
 
 const App = () => {
   const handleClickProm = (piece) => {
-    console.log('piece', piece);
+    console.log("piece", piece);
     setChessBoard((prevState) => {
       let board = emptyBoard();
       for (let i = 0; i < 64; ++i) {
@@ -214,18 +214,21 @@ const App = () => {
         }
         board[0][i] = prevState[0][i];
       }
-      board[0][currMove[1]] = piece;   
-      return board; 
+      board[0][currMove[1]] = piece;
+      return board;
     });
-    setPawnPromotionStyle({display: 'none'});
-  }
+    setPawnPromotionStyle({ display: "none" });
+    setAllowMove(true);
+  };
   initGame();
   const [showModal, setShowModal] = useState(false);
   const [chessBoard, setChessBoard] = useState(initBoard());
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [positions, setPositions] = useState([]);
-  let endgame = false;
-  const [pawnPromotionStyle, setPawnPromotionStyle] = useState({display: 'none'});
+  const [allowMove, setAllowMove] = useState(true);
+  const [pawnPromotionStyle, setPawnPromotionStyle] = useState({
+    display: "none",
+  });
   // console.log(chessBoard);
   const handleClick = (index) => {
     let move = null;
@@ -236,20 +239,27 @@ const App = () => {
       setPositions([]);
       currPositions = [];
       setSelectedPiece(index);
-      whoMoves ^= 1;
     } else {
-      if (
-        chessBoard[0][index] === null ||
-        getPieceColor(chessBoard[0][index]) !== whoMoves
-      ) {
+      console.log("allowMove: ", allowMove);
+      if (!allowMove) {
         setPositions([]);
         setSelectedPiece(null);
         currPositions = [];
         move = null;
       } else {
-        currPositions = PieceMoves(index, chessBoard[0], gameMoves);
-        setPositions(currPositions);
-        setSelectedPiece(index);
+        if (
+          chessBoard[0][index] === null ||
+          getPieceColor(chessBoard[0][index]) !== whoMoves
+        ) {
+          setPositions([]);
+          setSelectedPiece(null);
+          currPositions = [];
+          move = null;
+        } else {
+          currPositions = PieceMoves(index, chessBoard[0], gameMoves);
+          setPositions(currPositions);
+          setSelectedPiece(index);
+        }
       }
     }
 
@@ -260,7 +270,9 @@ const App = () => {
         prevState[0][index] !== null &&
         getPieceColor(prevState[0][index]) === whoMoves
       ) {
-        board[1][index] = 3;
+        if (allowMove) {
+          board[1][index] = 3;
+        }
       }
       for (let i = 0; i < 64; ++i) {
         if (prevState[1][i] === 5) {
@@ -280,20 +292,29 @@ const App = () => {
           console.log("pawn promotion");
           let [x, y] = getPos(move[1]);
           if (getPieceColor(board[0][move[1]]) === 1) {
-            console.log('black prom');
-            setPawnPromotionStyle({display: 'grid', left: (28.5 + 4.3 * y).toString() + "%", bottom: '5.5%'});
+            console.log("black prom");
+            setPawnPromotionStyle({
+              display: "grid",
+              left: (28.5 + 4.3 * y).toString() + "%",
+              bottom: "5.5%",
+            });
+          } else {
+            console.log("white prom");
+            setPawnPromotionStyle({
+              display: "grid",
+              left: (28.5 + 4.3 * y).toString() + "%",
+              top: "5.5%",
+            });
           }
-          else {
-            console.log('white prom');
-            setPawnPromotionStyle({display: 'grid', left: (28.5 + 4.3 * y).toString() + "%", top: '5.5%'});
-          }
+          setAllowMove(false);
           console.log(pawnPromotionStyle);
         }
         lastMove = move;
         board[1][move[1]] = null;
         if (endGame(board[0], 1 - player)) {
-          setPawnPromotionStyle({display: 'none'});
+          setPawnPromotionStyle({ display: "none" });
         }
+        whoMoves ^= 1;
       }
       board[1][lastMove[0]] = 5;
       board[1][lastMove[1]] = 5;
@@ -326,7 +347,11 @@ const App = () => {
   // console.log(pawnPromotionStyle);
   return (
     <div>
-      <PawnPromotionBox handleClickProm={handleClickProm} pawnPromotionStyle={pawnPromotionStyle} player={1 - whoMoves} />
+      <PawnPromotionBox
+        handleClickProm={handleClickProm}
+        pawnPromotionStyle={pawnPromotionStyle}
+        player={1 - whoMoves}
+      />
       <Board handleClick={handleClick} board={chessBoard} />
     </div>
   );

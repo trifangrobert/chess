@@ -296,14 +296,14 @@ const App = () => {
             setPawnPromotionStyle({
               display: "grid",
               left: (28.5 + 4.3 * y).toString() + "%",
-              bottom: "5.5%",
+              bottom: "-51em",
             });
           } else {
             console.log("white prom");
             setPawnPromotionStyle({
               display: "grid",
               left: (28.5 + 4.3 * y).toString() + "%",
-              top: "5.5%",
+              top: "3em",
             });
           }
           setAllowMove(false);
@@ -347,12 +347,13 @@ const App = () => {
   // console.log(pawnPromotionStyle);
   return (
     <div>
-      <PawnPromotionBox
-        handleClickProm={handleClickProm}
-        pawnPromotionStyle={pawnPromotionStyle}
-        player={1 - whoMoves}
-      />
-      <Board handleClick={handleClick} board={chessBoard} />
+      <Board handleClick={handleClick} board={chessBoard}>
+        <PawnPromotionBox
+          handleClickProm={handleClickProm}
+          pawnPromotionStyle={pawnPromotionStyle}
+          player={1 - whoMoves}
+        />
+      </Board>
     </div>
   );
 };

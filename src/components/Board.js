@@ -33,6 +33,7 @@ const Board = (props) => {
   let boardPiece = props.board[0];
   let boardState = props.board[1];
   return (
+    <>
     <div className={classes.board}>
       {boardPiece.map((square, index) => (
         <Square
@@ -47,6 +48,8 @@ const Board = (props) => {
         />
       ))}
     </div>
+    {props.children}
+    </>
   );
 };
 

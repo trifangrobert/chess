@@ -9,9 +9,9 @@ const squareColor = (index) => {
     let position = getIndex(index);
     // console.log(position);
     if ((position[0] + position[1]) % 2 === 0) {
-        return 'light';
+        return 'light-square';
     }
-    return 'dark';
+    return 'dark-square';
 }
 
 const getRow = (index) => {

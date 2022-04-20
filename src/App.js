@@ -7,6 +7,7 @@ import AttackedPositions from "./pieces/Moves/AttackedPositions.js";
 import { getPieceColor } from "./useful functions/PieceFunctions";
 import checkPawnPromotion from "./chess rules/PawnPromotion.js";
 import PawnPromotionBox from "./components/PawnPromotionBox.js";
+import Endgame from "./components/Endgame";
 
 const emptyBoard = () => {
   return [new Array(64).fill(null), new Array(64).fill(null)];
@@ -27,7 +28,15 @@ const initBoard = () => {
   1-6 white, 7-12 black
   */
   let board = emptyBoard();
-  
+
+  // Stalemate tester
+  // board[0][56] = 5;
+  // board[0][58] = 5;
+  // board[0][7] = 5;
+  // board[0][23] = 5;
+  // board[0][63] = 1;
+  // board[0][9] = 7;
+
   for (let i = 0; i < 8; i++) {
     board[0][48 + i] = 6; // white pawn
     board[0][8 + i] = 12; //black pawn
@@ -53,6 +62,8 @@ const initBoard = () => {
 const initGame = () => {
   return true;
 };
+
+
 
 const check = (board) => {
   // console.log(board);
@@ -233,6 +244,7 @@ const App = () => {
   };
   initGame();
   const [showModal, setShowModal] = useState(false);
+  const [messageEndgame, setMessageEndgame] = useState("");
   const [chessBoard, setChessBoard] = useState(initBoard());
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [positions, setPositions] = useState([]);
@@ -323,8 +335,21 @@ const App = () => {
         }
         lastMove = move;
         board[1][move[1]] = null;
-        if (endGame(board[0], 1 - player)) {
-          alert("gata s-a terminat jocu!");
+        let endGameResult = endGame(board[0], 1 - player);
+        if (endGameResult) {
+          setShowModal(true);
+          if (endGameResult === 1) {
+            if (player === 1) {
+              setMessageEndgame("Checkmate! Black won!");
+            }
+            else {
+              setMessageEndgame("Checkmate! White won!");
+            }
+            
+          }
+          if (endGameResult === 2) {
+            setMessageEndgame("Stalemate!");
+          }
           setPawnPromotionStyle({ display: "none" });
           setAllowMove(false);
         }
@@ -358,9 +383,31 @@ const App = () => {
       return board;
     });
   };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  }
+
+  const handleRestart = () => {
+    setShowModal(false);
+    setMessageEndgame("");
+    setChessBoard(initBoard());
+    setSelectedPiece(null);
+    setPositions([]);
+    setAllowMove(true);
+    setPawnPromotionStyle({
+      display: "none",
+    });
+    whoMoves = 0;
+    lastMove = [null, null];
+    gameMoves = [];
+
+  }
+
   // console.log(pawnPromotionStyle);
   return (
     <div>
+      {showModal && <Endgame message={messageEndgame} onClose={handleCloseModal} handleButtonPlayAgain={handleRestart}/>}
       <Board handleClick={handleClick} board={chessBoard}>
         <PawnPromotionBox
           handleClickProm={handleClickProm}

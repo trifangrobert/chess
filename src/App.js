@@ -27,11 +27,7 @@ const initBoard = () => {
   1-6 white, 7-12 black
   */
   let board = emptyBoard();
-
-  // board[0][8] = 6;
-  // board[0][15] = 6;
-  // board[0][22] = 6;
-  // board[0][48] = 12;
+  
   for (let i = 0; i < 8; i++) {
     board[0][48 + i] = 6; // white pawn
     board[0][8 + i] = 12; //black pawn
@@ -124,13 +120,13 @@ const checkMate = (board, player) => {
     }
     for (let i = 0; i < blackPieces.length; ++i) {
       let l = PieceMoves(blackPieces[i], board, gameMoves);
-      console.log(l);
+      // console.log(l);
       for (let j = 0; j < l.length; ++j) {
         let nextBoard = emptyBoard();
         for (let k = 0; k < 64; ++k) {
           nextBoard[k] = board[k];
         }
-        console.log(nextBoard);
+        // console.log(nextBoard);
         nextBoard = doMove(nextBoard, [blackPieces[i], l[j]], l[j], lastMove);
         let [checkWhite, checkBlack] = check(nextBoard);
         if (checkBlack === false) {
@@ -184,7 +180,7 @@ const staleMate = (board, player) => {
 
 const endGame = (board, player) => {
   if (staleMate(board, player)) {
-    console.log("stalemate");
+    // console.log("stalemate");
     return 2;
   }
   let [checkWhite, checkBlack] = check(board);
@@ -195,7 +191,7 @@ const endGame = (board, player) => {
     return 0;
   }
   if (checkMate(board, player)) {
-    console.log("checkmate");
+    // console.log("checkmate");
     return 1;
   }
   return 0;
@@ -205,7 +201,7 @@ let currMove;
 
 const App = () => {
   const handleClickProm = (piece) => {
-    console.log("piece", piece);
+    // console.log("piece", piece);
     setChessBoard((prevState) => {
       let board = emptyBoard();
       for (let i = 0; i < 64; ++i) {
@@ -215,6 +211,21 @@ const App = () => {
         board[0][i] = prevState[0][i];
       }
       board[0][currMove[1]] = piece;
+      let [checkWhite, checkBlack] = check(board[0]);
+      if (checkBlack === true) {
+        for (let i = 0; i < 64; ++i) {
+          if (board[0][i] === 7) {
+            board[1][i] = 4;
+          }
+        }
+      }
+      if (checkWhite === true) {
+        for (let i = 0; i < 64; ++i) {
+          if (board[0][i] === 1) {
+            board[1][i] = 4;
+          }
+        }
+      }
       return board;
     });
     setPawnPromotionStyle({ display: "none" });
@@ -240,7 +251,7 @@ const App = () => {
       currPositions = [];
       setSelectedPiece(index);
     } else {
-      console.log("allowMove: ", allowMove);
+      // console.log("allowMove: ", allowMove);
       if (!allowMove) {
         setPositions([]);
         setSelectedPiece(null);
@@ -257,6 +268,7 @@ const App = () => {
           move = null;
         } else {
           currPositions = PieceMoves(index, chessBoard[0], gameMoves);
+          // console.log(currPositions);
           setPositions(currPositions);
           setSelectedPiece(index);
         }
@@ -289,17 +301,17 @@ const App = () => {
         board[1][lastMove[1]] = null;
         board[0] = doMove(board[0], move, index, lastMove);
         if (checkPawnPromotion(board[0], move)) {
-          console.log("pawn promotion");
+          // console.log("pawn promotion");
           let [x, y] = getPos(move[1]);
           if (getPieceColor(board[0][move[1]]) === 1) {
-            console.log("black prom");
+            // console.log("black prom");
             setPawnPromotionStyle({
               display: "grid",
               left: (28.5 + 4.3 * y).toString() + "%",
               bottom: "-51em",
             });
           } else {
-            console.log("white prom");
+            // console.log("white prom");
             setPawnPromotionStyle({
               display: "grid",
               left: (28.5 + 4.3 * y).toString() + "%",
@@ -307,12 +319,14 @@ const App = () => {
             });
           }
           setAllowMove(false);
-          console.log(pawnPromotionStyle);
+          // console.log(pawnPromotionStyle);
         }
         lastMove = move;
         board[1][move[1]] = null;
         if (endGame(board[0], 1 - player)) {
+          alert("gata s-a terminat jocu!");
           setPawnPromotionStyle({ display: "none" });
+          setAllowMove(false);
         }
         whoMoves ^= 1;
       }

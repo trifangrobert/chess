@@ -1,8 +1,8 @@
 import { getPieceColor, getPos, getPiece } from "../useful functions/PieceFunctions";
 
 const checkPawnPromotion = (board, move) => {
-    console.log("check for pawn promotion");
-    console.log(getPiece(board[move[1]]));
+    // console.log("check for pawn promotion");
+    // console.log(getPiece(board[move[1]]));
     if (getPiece(board[move[1]]) !== 6) {
         return false;
     } 

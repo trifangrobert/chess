@@ -169,6 +169,7 @@ const PieceMoves = (index, board, gameMoves = []) => {
         legalMove(getIndex(x, y), getIndex(i, j), board)
       ) {
         positions.push(newIndex);
+        // console.log(newIndex);
       }
     }
     if (checkKingCastling(gameMoves, board, index)) {

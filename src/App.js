@@ -8,6 +8,7 @@ import { getPieceColor } from "./useful functions/PieceFunctions";
 import checkPawnPromotion from "./chess rules/PawnPromotion.js";
 import PawnPromotionBox from "./components/PawnPromotionBox.js";
 import Endgame from "./components/Endgame";
+import classes from "./App.module.css";
 
 const emptyBoard = () => {
   return [new Array(64).fill(null), new Array(64).fill(null)];
